@@ -63,8 +63,9 @@ struct OnboardingView: View {
         case 0:
             Text("I sit in a corner of your screen and take small jobs: questions, scripts, and handing work to your coding agents. Three permissions and we're done.")
         case 1:
-            Text("Only while you hold ") + Text(hotkey).font(theme.font(.mono(13)))
-                + Text(", or when a prompt is waiting for a yes or no. Nothing listens in the background.")
+            Text("When you hold ") + Text(hotkey).font(theme.font(.mono(13)))
+                + Text(", when a prompt is waiting for a yes or no, and for my name — say ") + Text("“Haku”").italic()
+                + Text(". It all stays on this Mac. Turn name listening off in Settings anytime.")
         case 2:
             Text("macOS does the transcribing, on this Mac where it can. You can switch to a local Whisper model later in Settings.")
         case 3:

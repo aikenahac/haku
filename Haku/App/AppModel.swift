@@ -19,6 +19,8 @@ final class AppModel: BrainHost {
     let tasks = TaskStore()
     let confirmations = ConfirmationCenter()
     @ObservationIgnored let runner: AgentRunner
+    let wake = WakeWordService()
+    @ObservationIgnored private var wakePaused = false
 
     // Conversation
     private(set) var messages: [ChatMessage] = []
@@ -54,6 +56,61 @@ final class AppModel: BrainHost {
             brain.seed(messages)
         }
         attachmentsStore.purgeAll()
+        wake.onWake = { [weak self] after in self?.wakeHeard(after) }
+    }
+
+    // MARK: Wake word
+
+    /// Starts/stops the detector to match settings and permissions; pauses it while Haku is busy with audio.
+    func syncWakeWord() {
+        wake.sensitivity = settings.wakeSensitivity
+        wake.locale = settings.primaryLocale
+        if settings.wakeWordEnabled && settings.onboardingDone && Permissions.microphone == .allowed {
+            if wake.status == .off || { if case .unavailable = wake.status { return true }; return false }() { wake.start() }
+        } else if wake.status != .off {
+            wake.stop()
+        }
+    }
+
+    /// Called from an observation loop: pause detection while listening, speaking or confirming.
+    func updateWakePause() {
+        let busy = voice.phase != .idle || confirmations.current != nil
+        if busy && !wakePaused { wakePaused = true; wake.pause() }
+        else if !busy && wakePaused { wakePaused = false; wake.resume() }
+    }
+
+    private func wakeHeard(_ after: String?) {
+        guard confirmations.current == nil, !voice.isListening else { return }
+        voice.stopSpeaking()
+        if let after, after.split(separator: " ").count >= 2 {
+            send(after, spoken: true)
+        } else {
+            startHandsFree()
+        }
+    }
+
+    /// Listens after the wake word and stops on its own once you've finished speaking.
+    func startHandsFree() {
+        NSSound(named: "Tink")?.play()
+        clearError()
+        Task {
+            do { try await voice.beginListening() } catch { handleVoiceError(error); return }
+            let start = Date.now
+            var lastText = ""
+            var lastChange = Date.now
+            while voice.isListening {
+                try? await Task.sleep(for: .milliseconds(120))
+                let text = voice.partial.trimmingCharacters(in: .whitespacesAndNewlines)
+                if text != lastText { lastText = text; lastChange = .now }
+                let elapsed = Date.now.timeIntervalSince(start)
+                if text.isEmpty && elapsed > 6 { voice.cancelListening(); return }            // nothing said
+                if !text.isEmpty && Date.now.timeIntervalSince(lastChange) > 1.3 && voice.level < 0.35 { break } // finished
+                if elapsed > 25 { break }
+            }
+            guard voice.isListening else { return }
+            let text = await voice.endListening()
+            if !text.isEmpty { send(text, spoken: true) }
+        }
     }
 
     // MARK: Widget state

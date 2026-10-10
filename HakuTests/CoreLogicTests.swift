@@ -176,3 +176,23 @@ final class WorkflowTests: XCTestCase {
         XCTAssertEqual(try? FileManager.default.contentsOfDirectory(atPath: dir.path).count, 3, "preview must not delete")
     }
 }
+
+final class WakeWordTests: XCTestCase {
+    @available(macOS 26.0, *)
+    func testFallbackPatternCapturesCommand() throws {
+        func match(_ s: String) -> String? {
+            let r = NSRange(s.startIndex..., in: s)
+            guard let m = FallbackWakeSession.pattern.firstMatch(in: s, range: r) else { return nil }
+            return Range(m.range(at: 2), in: s).map { String(s[$0]) } ?? ""
+        }
+        XCTAssertEqual(match("Haku, open notes"), "open notes")
+        XCTAssertEqual(match("hey Hakoo"), "")
+        XCTAssertNil(match("the hackathon is today"))
+        XCTAssertNil(match("Hakuna matata"))
+    }
+
+    func testSensitivityMapsToThreshold() {
+        XCTAssertEqual(WakeWordService.threshold(0), 0.8, accuracy: 0.001)
+        XCTAssertEqual(WakeWordService.threshold(1), 0.2, accuracy: 0.001)
+    }
+}

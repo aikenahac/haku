@@ -343,6 +343,33 @@ struct HotkeySettings: View {
             FormRow(label: "Rate") {
                 Slider(value: $settings.speechRate, in: 0...1).tint(theme.colors.ink)
             }
+            FormRow(label: "Listen for “Haku”") {
+                HStack(spacing: 10) {
+                    InkSwitch(isOn: $settings.wakeWordEnabled)
+                    Text(settings.wakeWordEnabled ? model.wake.status.label : "off · only the hotkey opens the mic")
+                        .textRole(.ui, theme).foregroundStyle(theme.colors.muted)
+                }
+            }
+            if settings.wakeWordEnabled {
+                FormRow(label: "Sensitivity") {
+                    HStack(spacing: 10) {
+                        Text("fewer false starts").textRole(.ui, theme).foregroundStyle(theme.colors.muted)
+                        Slider(value: $settings.wakeSensitivity, in: 0...1).tint(theme.colors.ink)
+                        Text("hears more").textRole(.ui, theme).foregroundStyle(theme.colors.muted)
+                    }
+                }
+                FormRow(label: "Wake model") {
+                    HStack(spacing: 10) {
+                        Text(WakeWordService.customModelInstalled ? "custom “Haku” model installed" : "on-device speech (train a custom model for lower power)")
+                            .textRole(.ui, theme).foregroundStyle(theme.colors.muted)
+                        Button("show folder") {
+                            try? FileManager.default.createDirectory(at: WakeWordService.modelDirectory, withIntermediateDirectories: true)
+                            NSWorkspace.shared.open(WakeWordService.modelDirectory)
+                        }
+                        .buttonStyle(InkLinkStyle(size: 13))
+                    }
+                }
+            }
             FormRow(label: "Confirm by voice") {
                 HStack(spacing: 10) {
                     InkSwitch(isOn: $settings.confirmByVoice)

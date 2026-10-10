@@ -1,5 +1,5 @@
 {
-  "originHash" : "9a97c8073af9b07b8c46128893fdd0b6f4eb090da4c6175aa09be32df1ea140f",
+  "originHash" : "971f2f0668d9ded4beb3fd16638b7500e3582b1a118ad931cd8c06a39c91f9aa",
   "pins" : [
     {
       "identity" : "keyboardshortcuts",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "1aef85578fdd4f9eaeeb8d53b7b4fc31bf08fe27",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "onnxruntime-swift-package-manager",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/microsoft/onnxruntime-swift-package-manager",
+      "state" : {
+        "revision" : "b7fb7f7dea8a2469e6335d95a61b8f36d0dc83b2",
+        "version" : "1.24.2"
       }
     },
     {

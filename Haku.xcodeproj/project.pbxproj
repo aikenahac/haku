@@ -27,10 +27,12 @@
 		436C5D09C5339D531CB10C42 /* Themes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20437EE1E950B76B296BBE /* Themes.swift */; };
 		454E02D47D1CB5D33B0F003E /* ConversationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F023D2CFAB5759A6D093F9AC /* ConversationModels.swift */; };
 		51859C7AE9CFF51CA9A2CA5C /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = B98A2F8EEE56BF0B2A291D16 /* AppSettings.swift */; };
+		56698101A05A4A9CC6213155 /* OpenWakeWordDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6310681D7B72E7840B6A282 /* OpenWakeWordDetector.swift */; };
 		587378023DCFE9A6BF071D60 /* WidgetController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAAF1C1257DF2789DA49FF9 /* WidgetController.swift */; };
 		5A0F0CE09601D14454B357A6 /* Permissions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 578D2D24401DEFFED6D742EA /* Permissions.swift */; };
 		5F63DA6573F97D67E3EBA82E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 628F82820B0F175E0C907748 /* Theme.swift */; };
 		63F05CD8C2B145E52232C90A /* DesignGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CDD4430F2DFE1564B58B927 /* DesignGallery.swift */; };
+		68FD3CA49340B52B73954526 /* onnxruntime in Frameworks */ = {isa = PBXBuildFile; productRef = 00EFFAD039B9E4CFB4375655 /* onnxruntime */; };
 		6DF69C585735C43EF2BDD6AA /* TextToSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CD700ECA4129AB3DE3B3DB /* TextToSpeech.swift */; };
 		71E50F14D544671422A4CA88 /* AppPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6595DEB054E3814D80F6E5D /* AppPaths.swift */; };
 		733F28629FCB6381FE67ECB7 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86FFABAA04B87D50715D650 /* Log.swift */; };
@@ -57,6 +59,7 @@
 		D7F4C52742CBAB2B6DD0315C /* OpenAIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9864CD2EEE75673B861F3EC4 /* OpenAIClient.swift */; };
 		D8975AC286AEDC82312A2320 /* FormControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFF0A0AE71BCA3CAB80C754B /* FormControls.swift */; };
 		DA206E2E44FF3233B8DD3A20 /* HotkeyManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F5820B7AC185B26D7A55B81 /* HotkeyManager.swift */; };
+		E48595E58684EE058CEA9850 /* WakeWordService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27ACAFAC64609101B1D84177 /* WakeWordService.swift */; };
 		E49D6A56DBD432555E7303E5 /* AttachmentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B274E9CEF725AABE3E87E9 /* AttachmentStore.swift */; };
 		E7CFE20A5E24BD0F513F1273 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FE85CAE9B660D0494AC0502B /* Colors.xcassets */; };
 		E942D1F27F53A106B1828590 /* InkMarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC7EA3C6E844CB1961234FFD /* InkMarks.swift */; };
@@ -88,6 +91,7 @@
 		24F7E121D3397F6DF76F032D /* WidgetState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetState.swift; sourceTree = "<group>"; };
 		26A196C9161C9B00F5F40353 /* VoicePipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoicePipeline.swift; sourceTree = "<group>"; };
 		2730892CD71A8AFDD0F26ACB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		27ACAFAC64609101B1D84177 /* WakeWordService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WakeWordService.swift; sourceTree = "<group>"; };
 		27F58E8D5F39E703EECDF8E9 /* HakuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HakuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DF89FC455134D53B1D6A665 /* PaperSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperSurface.swift; sourceTree = "<group>"; };
 		3069F16C7A3EE5856A07E077 /* PreviewSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewSnapshotTests.swift; sourceTree = "<group>"; };
@@ -122,6 +126,7 @@
 		B98A2F8EEE56BF0B2A291D16 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		BEC58083A374D0EFCE7EC772 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
 		BF9D25CDB1DD56BCD4A46122 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C6310681D7B72E7840B6A282 /* OpenWakeWordDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenWakeWordDetector.swift; sourceTree = "<group>"; };
 		C8DACD7D16852F6EC7FA000E /* ColorTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTokens.swift; sourceTree = "<group>"; };
 		C9B089933F1617D73E231716 /* AgentJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentJob.swift; sourceTree = "<group>"; };
 		CA447FD02E775CB341916E98 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
@@ -151,12 +156,22 @@
 			files = (
 				D730E46B2E1FFA52F660C785 /* KeyboardShortcuts in Frameworks */,
 				22C19A4A4B53C927BF837A90 /* WhisperKit in Frameworks */,
+				68FD3CA49340B52B73954526 /* onnxruntime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0E9036D311347E361C7A0A61 /* WakeWord */ = {
+			isa = PBXGroup;
+			children = (
+				C6310681D7B72E7840B6A282 /* OpenWakeWordDetector.swift */,
+				27ACAFAC64609101B1D84177 /* WakeWordService.swift */,
+			);
+			path = WakeWord;
+			sourceTree = "<group>";
+		};
 		1A40749D09D1175F05ED9BE2 /* Store */ = {
 			isa = PBXGroup;
 			children = (
@@ -333,6 +348,7 @@
 		7EFC2AA6C87CF116D2E234A9 /* Voice */ = {
 			isa = PBXGroup;
 			children = (
+				0E9036D311347E361C7A0A61 /* WakeWord */,
 				04FFCD921AAC4758E6B20253 /* AudioCapture.swift */,
 				595B218D72085E65951989D4 /* SpeechToText.swift */,
 				65CD700ECA4129AB3DE3B3DB /* TextToSpeech.swift */,
@@ -502,6 +518,7 @@
 			packageProductDependencies = (
 				26A59547900B72243A0AD860 /* KeyboardShortcuts */,
 				DAA1DB0404FBD4EC5F767F3C /* WhisperKit */,
+				00EFFAD039B9E4CFB4375655 /* onnxruntime */,
 			);
 			productName = Haku;
 			productReference = 717AE8CFE12D03D770CA9580 /* Haku.app */;
@@ -538,6 +555,7 @@
 			packageReferences = (
 				57391167D7F5B0F1F6D27790 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				3B012170D9F32DF5E68D054B /* XCRemoteSwiftPackageReference "WhisperKit" */,
+				52D6A7FE8BCD19525411841C /* XCRemoteSwiftPackageReference "onnxruntime-swift-package-manager" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 48EBC27C26D26B81E5A328FD /* Products */;
@@ -596,6 +614,7 @@
 				AA567E7013B8CF83D3F94D37 /* Motion.swift in Sources */,
 				14D4C42AE6EFB17C50CD925D /* OnboardingView.swift in Sources */,
 				D7F4C52742CBAB2B6DD0315C /* OpenAIClient.swift in Sources */,
+				56698101A05A4A9CC6213155 /* OpenWakeWordDetector.swift in Sources */,
 				3F1AE6C735CA4E3DC6AF6AD4 /* PaperSurface.swift in Sources */,
 				5A0F0CE09601D14454B357A6 /* Permissions.swift in Sources */,
 				3598FD75F0CE6D5F79D5EFDD /* Previews.swift in Sources */,
@@ -613,6 +632,7 @@
 				436C5D09C5339D531CB10C42 /* Themes.swift in Sources */,
 				CCC6B10DCE6B5662BB3299EB /* Typography.swift in Sources */,
 				FEEF8F0807306B9ED95A10FB /* VoicePipeline.swift in Sources */,
+				E48595E58684EE058CEA9850 /* WakeWordService.swift in Sources */,
 				587378023DCFE9A6BF071D60 /* WidgetController.swift in Sources */,
 				D35074C0EB718FE08669441A /* WidgetMetrics.swift in Sources */,
 				210E75CDA7EB10A9AD96297E /* WidgetState.swift in Sources */,
@@ -888,6 +908,14 @@
 				minimumVersion = 0.9.0;
 			};
 		};
+		52D6A7FE8BCD19525411841C /* XCRemoteSwiftPackageReference "onnxruntime-swift-package-manager" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/microsoft/onnxruntime-swift-package-manager";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.20.0;
+			};
+		};
 		57391167D7F5B0F1F6D27790 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
@@ -899,6 +927,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		00EFFAD039B9E4CFB4375655 /* onnxruntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 52D6A7FE8BCD19525411841C /* XCRemoteSwiftPackageReference "onnxruntime-swift-package-manager" */;
+			productName = onnxruntime;
+		};
 		26A59547900B72243A0AD860 /* KeyboardShortcuts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 57391167D7F5B0F1F6D27790 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;

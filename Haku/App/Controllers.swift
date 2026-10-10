@@ -202,7 +202,7 @@ final class StatusItemController {
         item.button?.target = self
         item.button?.action = #selector(clicked)
         item.button?.sendAction(on: [.leftMouseUp, .rightMouseUp])
-        observe { [weak self] in
+        observeChanges { [weak self] in
             guard let self else { return }
             let live: Bool = {
                 if case .idle = self.model.widgetState { return false }

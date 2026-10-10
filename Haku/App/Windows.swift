@@ -32,11 +32,11 @@ final class FloatingPanel: NSPanel {
 
 /// Re-runs `apply` whenever any observable value it reads changes.
 @MainActor
-func observe(_ apply: @escaping @MainActor () -> Void) {
+func observeChanges(_ apply: @escaping @MainActor () -> Void) {
     withObservationTracking {
         apply()
     } onChange: {
-        Task { @MainActor in observe(apply) }
+        Task { @MainActor in observeChanges(apply) }
     }
 }
 

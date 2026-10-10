@@ -119,6 +119,7 @@ final class AppSettings {
     var confirmByVoice: Bool { didSet { save() } }
     var whisperModel: String { didSet { save() } }
     var wakeWordEnabled: Bool { didSet { save() } }
+    var wakeSensitivity: Double { didSet { save() } }
 
     // General
     var onboardingDone: Bool { didSet { save() } }
@@ -144,6 +145,7 @@ final class AppSettings {
         var confirmByVoice = true
         var whisperModel = "openai_whisper-base"
         var wakeWordEnabled = true
+        var wakeSensitivity = 0.5
         var onboardingDone = false
         var showWidget = true
         var keepHistory = true
@@ -163,7 +165,7 @@ final class AppSettings {
         claude = s.claude; codex = s.codex; defaultFolder = s.defaultFolder; maxConcurrentJobs = s.maxConcurrentJobs
         sttEngine = s.sttEngine; languages = s.languages; speakReplies = s.speakReplies
         voiceIdentifier = s.voiceIdentifier; speechRate = s.speechRate; confirmByVoice = s.confirmByVoice
-        whisperModel = s.whisperModel; wakeWordEnabled = s.wakeWordEnabled
+        whisperModel = s.whisperModel; wakeWordEnabled = s.wakeWordEnabled; wakeSensitivity = s.wakeSensitivity
         onboardingDone = s.onboardingDone; showWidget = s.showWidget; keepHistory = s.keepHistory
     }
 
@@ -183,7 +185,7 @@ final class AppSettings {
                        claude: claude, codex: codex, defaultFolder: defaultFolder,
                        maxConcurrentJobs: maxConcurrentJobs, sttEngine: sttEngine, languages: languages,
                        speakReplies: speakReplies, voiceIdentifier: voiceIdentifier, speechRate: speechRate,
-                       confirmByVoice: confirmByVoice, whisperModel: whisperModel, wakeWordEnabled: wakeWordEnabled,
+                       confirmByVoice: confirmByVoice, whisperModel: whisperModel, wakeWordEnabled: wakeWordEnabled, wakeSensitivity: wakeSensitivity,
                        onboardingDone: onboardingDone, showWidget: showWidget, keepHistory: keepHistory)
         if let data = try? JSONEncoder().encode(s) { defaults.set(data, forKey: Self.key) }
     }
@@ -194,7 +196,7 @@ final class AppSettings {
         var fallback: FallbackPolicy?; var apiKey: String?; var claude: AgentConfig?; var codex: AgentConfig?
         var defaultFolder: String?; var maxConcurrentJobs: Int?; var sttEngine: STTEngine?; var languages: [String]?
         var speakReplies: SpeakReplies?; var voiceIdentifier: String?; var speechRate: Double?; var confirmByVoice: Bool?
-        var whisperModel: String?; var wakeWordEnabled: Bool?; var onboardingDone: Bool?; var showWidget: Bool?
+        var whisperModel: String?; var wakeWordEnabled: Bool?; var wakeSensitivity: Double?; var onboardingDone: Bool?; var showWidget: Bool?
         var keepHistory: Bool?
 
         func apply(to s: inout Stored) {
@@ -207,6 +209,7 @@ final class AppSettings {
             if let v = speakReplies { s.speakReplies = v }; if let v = voiceIdentifier { s.voiceIdentifier = v }
             if let v = speechRate { s.speechRate = v }; if let v = confirmByVoice { s.confirmByVoice = v }
             if let v = whisperModel { s.whisperModel = v }; if let v = wakeWordEnabled { s.wakeWordEnabled = v }
+            if let v = wakeSensitivity { s.wakeSensitivity = v }
             if let v = onboardingDone { s.onboardingDone = v }; if let v = showWidget { s.showWidget = v }
             if let v = keepHistory { s.keepHistory = v }
         }

@@ -67,6 +67,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if settings.showWidget { widget.show() }
         if !settings.onboardingDone { showOnboarding() }
 
+        // Wake word follows its setting, permissions, and whatever else is using the mic.
+        observeChanges { [unowned self] in
+            _ = (settings.wakeWordEnabled, settings.wakeSensitivity, settings.onboardingDone, settings.languages)
+            model.syncWakeWord()
+        }
+        observeChanges { [unowned self] in model.updateWakePause() }
+        Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.model.syncWakeWord() }   // picks up a newly granted mic
+        }
+
         Task {
             while true {
                 await model.refreshModelStatus()
@@ -94,7 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             switch url.host {
             case "panel": panel.show()
             case "tasks": showTasks(select: nil)
-            case "settings": showSettings(nil)
+            case "settings": showSettings(text.isEmpty ? nil : text)
             case "workflows": showWorkflows()
             case "ask":
                 model.draft = text

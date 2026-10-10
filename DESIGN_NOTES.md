@@ -11,6 +11,19 @@ This log covers gaps, ambiguities, and decisions I made where `design/` was sile
 | Widget gestures | Press and hold the widget, or hold ⌥Space, to talk. A click toggles the expanded panel. Right-click opens the menu. Dropping a file or image on the widget attaches it. |
 | Workflows | Each workflow has one action (Ask model / Shell / Script / Agent), as in the editor mockup. Multi-step chains are deferred. |
 
+## Wake word (built 2026-10-10)
+
+- **On by default**, as agreed. Onboarding step 2 now says Haku listens when you hold the hotkey, when a prompt waits for an answer, and for its name, all on this Mac. The switch is at Settings › Hotkeys & voice › Listen for “Haku”, with a status line, a sensitivity slider and the wake-model state.
+- **Two detectors:**
+  - A custom openWakeWord model run through ONNX Runtime, used when `~/Library/Application Support/Haku/wakeword/{melspectrogram,embedding_model,haku}.onnx` exist. Train it with `tools/wakeword/train_haku.sh`.
+  - Until then, continuous on-device SpeechAnalyzer transcription matching “Haku” and common mishearings.
+  - The sensitivity slider only affects the custom model.
+- **Detection pauses** while you hold to talk, while Haku speaks, and while a slip is waiting, so Haku doesn't wake itself.
+- **After the wake word:**
+  - Two or more words in the same breath (“Haku, open notes”) are sent straight away.
+  - Otherwise a soft “Tink” plays and Haku listens hands-free, stopping after about 1.3 s of silence. If nothing is said within 6 s it gives up.
+- **Visual:** the design has no state for wake listening, so the widget stays in its idle state. The macOS mic indicator shows while name listening is on.
+
 ## Tokens
 
 - **Single source:** `tools/design-tokens/colors.json` → `generate_assets.py` → `Haku/Resources/Colors.xcassets`. Don't edit the catalog by hand.
