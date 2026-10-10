@@ -23,8 +23,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.accessory)
     }
 
+    static var isTestHost: Bool { ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         themeManager.applyAppAppearance()
+        guard !Self.isTestHost else { return }
         model = AppModel(settings: settings, themes: themeManager)
 
         widget = WidgetController(model: model, themes: themeManager)
@@ -77,9 +80,57 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        guard let model else { return }
         for j in model.tasks.running { model.runner.cancel(j.id) }
         model.attachmentsStore.purgeAll()
     }
+
+    /// haku://panel, haku://tasks, haku://settings, haku://ask?text=… (fills the input; never sends on its own).
+    /// Debug builds also accept haku://send?text=… for end-to-end testing.
+    func application(_ application: NSApplication, open urls: [URL]) {
+        for url in urls where url.scheme == "haku" {
+            let text = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "text" }?.value ?? ""
+            switch url.host {
+            case "panel": panel.show()
+            case "tasks": showTasks(select: nil)
+            case "settings": showSettings(nil)
+            case "workflows": showWorkflows()
+            case "ask":
+                model.draft = text
+                panel.show()
+            #if DEBUG
+            case "send":
+                panel.show()
+                model.send(text, spoken: false)
+            case "snapshot": snapshotWindows(to: text)
+            case "approve": model.confirmations.approve(source: "url")
+            case "deny": model.confirmations.deny(source: "url")
+            case "state":
+                let shapes: [String: WidgetShape] = ["slip": .slip, "tab": .indexTab, "seal": .seal]
+                if let s = shapes[text] { themeManager.widgetShape = s }
+                if let t = ThemeID(rawValue: text) { themeManager.select(t) }
+            #endif
+            default: break
+            }
+        }
+    }
+
+    #if DEBUG
+    /// Renders every visible Haku window to PNGs (debug aid; needs no Screen Recording).
+    private func snapshotWindows(to dir: String) {
+        let out = URL(fileURLWithPath: dir.isEmpty ? NSTemporaryDirectory() : dir)
+        try? FileManager.default.createDirectory(at: out, withIntermediateDirectories: true)
+        var manifest: [String] = []
+        for (i, w) in NSApp.windows.enumerated() where w.isVisible {
+            guard let view = w.contentView, let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { continue }
+            view.cacheDisplay(in: view.bounds, to: rep)
+            let name = "\(i)-\(w.title.isEmpty ? String(describing: type(of: w)) : w.title.replacingOccurrences(of: " ", with: "_")).png"
+            try? rep.representation(using: .png, properties: [:])?.write(to: out.appendingPathComponent(name))
+            manifest.append("\(name) \(NSStringFromRect(w.frame)) key=\(w.isKeyWindow)")
+        }
+        try? manifest.joined(separator: "\n").write(to: out.appendingPathComponent("manifest.txt"), atomically: true, encoding: .utf8)
+    }
+    #endif
 
     private func toggleWidget() {
         settings.showWidget.toggle()

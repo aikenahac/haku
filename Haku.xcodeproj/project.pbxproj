@@ -12,6 +12,7 @@
 		1145C5A9736C46FFFD14821B /* PreviewSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3069F16C7A3EE5856A07E077 /* PreviewSnapshotTests.swift */; };
 		12A9D89FFB16B35E7623C9C7 /* Workflow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B90B684F2FF7E03811B949 /* Workflow.swift */; };
 		135B89795C1BB2F1B406CE85 /* SpeechToText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595B218D72085E65951989D4 /* SpeechToText.swift */; };
+		14A1DC68562F830876F43B24 /* CoreLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB325B9B882AAEC3F367D6E /* CoreLogicTests.swift */; };
 		14D4C42AE6EFB17C50CD925D /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB89123B22932D9A1FB8E13 /* OnboardingView.swift */; };
 		210E75CDA7EB10A9AD96297E /* WidgetState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F7E121D3397F6DF76F032D /* WidgetState.swift */; };
 		22C19A4A4B53C927BF837A90 /* WhisperKit in Frameworks */ = {isa = PBXBuildFile; productRef = DAA1DB0404FBD4EC5F767F3C /* WhisperKit */; };
@@ -32,6 +33,7 @@
 		63F05CD8C2B145E52232C90A /* DesignGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CDD4430F2DFE1564B58B927 /* DesignGallery.swift */; };
 		6DF69C585735C43EF2BDD6AA /* TextToSpeech.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65CD700ECA4129AB3DE3B3DB /* TextToSpeech.swift */; };
 		71E50F14D544671422A4CA88 /* AppPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6595DEB054E3814D80F6E5D /* AppPaths.swift */; };
+		733F28629FCB6381FE67ECB7 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86FFABAA04B87D50715D650 /* Log.swift */; };
 		7823FB14BA5C47090DA12F07 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192ACE9193C22285B3741256 /* SettingsView.swift */; };
 		80A899E016773F7A7FBB9C10 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF899928F5C441719189AAAB /* Spacing.swift */; };
 		8B92A68E65E69C7C444F9CCF /* ShellRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C648CA41E180A9447F5A4A3 /* ShellRunner.swift */; };
@@ -123,6 +125,8 @@
 		C8DACD7D16852F6EC7FA000E /* ColorTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTokens.swift; sourceTree = "<group>"; };
 		C9B089933F1617D73E231716 /* AgentJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AgentJob.swift; sourceTree = "<group>"; };
 		CA447FD02E775CB341916E98 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
+		CBB325B9B882AAEC3F367D6E /* CoreLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLogicTests.swift; sourceTree = "<group>"; };
+		D86FFABAA04B87D50715D650 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		DD7C5E65355ABF8E5328684B /* SystemServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemServices.swift; sourceTree = "<group>"; };
 		DF899928F5C441719189AAAB /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
 		E7CE5D9034AC223075C3AA4C /* Controllers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controllers.swift; sourceTree = "<group>"; };
@@ -233,6 +237,7 @@
 		4ECAD1C45AE4AC4B4B372985 /* System */ = {
 			isa = PBXGroup;
 			children = (
+				D86FFABAA04B87D50715D650 /* Log.swift */,
 				578D2D24401DEFFED6D742EA /* Permissions.swift */,
 				9C648CA41E180A9447F5A4A3 /* ShellRunner.swift */,
 				DD7C5E65355ABF8E5328684B /* SystemServices.swift */,
@@ -340,6 +345,7 @@
 			isa = PBXGroup;
 			children = (
 				F8E6CF0DBE8DF667DA429226 /* ContrastTests.swift */,
+				CBB325B9B882AAEC3F367D6E /* CoreLogicTests.swift */,
 				3069F16C7A3EE5856A07E077 /* PreviewSnapshotTests.swift */,
 			);
 			path = HakuTests;
@@ -510,7 +516,12 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					0D59431E3528C71522852D63 = {
+						DevelopmentTeam = 7LG2A4237Y;
+						ProvisioningStyle = Automatic;
+					};
 					407C099F6179AD145F91DFCC = {
+						DevelopmentTeam = 7LG2A4237Y;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -581,6 +592,7 @@
 				DA206E2E44FF3233B8DD3A20 /* HotkeyManager.swift in Sources */,
 				E942D1F27F53A106B1828590 /* InkMarks.swift in Sources */,
 				40D832DE13CBD25219F08F0E /* InkText.swift in Sources */,
+				733F28629FCB6381FE67ECB7 /* Log.swift in Sources */,
 				AA567E7013B8CF83D3F94D37 /* Motion.swift in Sources */,
 				14D4C42AE6EFB17C50CD925D /* OnboardingView.swift in Sources */,
 				D7F4C52742CBAB2B6DD0315C /* OpenAIClient.swift in Sources */,
@@ -616,6 +628,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D0051DD31CE11149FE36500C /* ContrastTests.swift in Sources */,
+				14A1DC68562F830876F43B24 /* CoreLogicTests.swift in Sources */,
 				1145C5A9736C46FFFD14821B /* PreviewSnapshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -635,8 +648,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7LG2A4237Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -653,8 +667,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7LG2A4237Y;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -672,9 +687,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Haku/Haku.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7LG2A4237Y;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Haku/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -757,9 +773,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Haku/Haku.entitlements;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7LG2A4237Y;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Haku/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

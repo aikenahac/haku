@@ -26,7 +26,8 @@ final class PanelController {
     func toggle() { isVisible ? hide() : show() }
 
     func show() {
-        let size = host.hosting.fittingSize
+        // The hosting view may not have laid out yet, so use the panel's design size.
+        let size = NSSize(width: PanelMetrics.size.width + 2 * margin, height: PanelMetrics.size.height + 2 * margin)
         host.panel.setContentSize(size)
         position(size: size)
         host.panel.makeKeyAndOrderFront(nil)
@@ -49,6 +50,7 @@ final class PanelController {
         x = min(max(x, v.minX + 8), v.maxX - content.width - 8)
         y = max(y, v.minY + 8)
         host.panel.setFrameOrigin(NSPoint(x: x - margin, y: y - margin))
+        Log.info("panel placed: widget=\(NSStringFromRect(w)) screen=\(NSStringFromRect(v)) size=\(NSStringFromSize(size)) → \(NSStringFromRect(host.panel.frame)) screens=\(NSScreen.screens.map { NSStringFromRect($0.frame) })")
     }
 }
 
@@ -119,29 +121,36 @@ final class ConfirmController {
             AnyView(ConfirmRootView().environment(model).environment(themes))
         }
         host.panel.level = .modalPanel
-        host.panel.onEscape = { [weak model] in model?.confirmations.deny() }
+        host.panel.onEscape = { [weak model] in model?.confirmations.deny(source: "esc") }
         model.confirmations.onPresent = { [weak self] _ in self?.show() }
         model.confirmations.onDismiss = { [weak self] in self?.hide() }
     }
 
     func show() {
-        DispatchQueue.main.async { [self] in
-            let size = host.hosting.fittingSize
-            host.panel.setContentSize(size)
-            if let w = widget?.contentFrame, let screen = NSScreen.screens.first(where: { $0.frame.intersects(w) }) ?? NSScreen.main {
-                let v = screen.visibleFrame
-                let m = WidgetMetrics.windowMargin
-                var x = w.midX > v.midX ? w.maxX - (size.width - 2 * m) : w.minX
-                var y = w.minY - 10 - (size.height - 2 * m)
-                if y < v.minY { y = w.maxY + 10 }
-                x = min(max(x, v.minX + 8), v.maxX - size.width + 2 * m - 8)
-                y = min(max(y, v.minY + 8), v.maxY - size.height + 2 * m)
-                host.panel.setFrameOrigin(NSPoint(x: x - m, y: y - m))
-            }
-            host.panel.makeKeyAndOrderFront(nil)
-            host.panel.orderFrontRegardless()
-            model.confirmationPresented()
-        }
+        place()
+        host.panel.makeKeyAndOrderFront(nil)
+        host.panel.orderFrontRegardless()
+        model.confirmationPresented()
+        // Re-place once SwiftUI has measured the slip's real height.
+        DispatchQueue.main.async { [self] in place() }
+    }
+
+    private func place() {
+        host.hosting.layoutSubtreeIfNeeded()
+        let m = WidgetMetrics.windowMargin
+        var size = host.hosting.fittingSize
+        if size.width < 10 || size.height < 10 { size = NSSize(width: ConfirmSlipView.width + 2 * m, height: 320) }
+        host.panel.setContentSize(size)
+        guard let w = widget?.contentFrame,
+              let screen = NSScreen.screens.first(where: { $0.visibleFrame.intersects(w) }) ?? NSScreen.main else { return }
+        let v = screen.visibleFrame
+        let content = NSSize(width: size.width - 2 * m, height: size.height - 2 * m)
+        var x = w.midX > v.midX ? w.maxX - content.width : w.minX
+        var y = w.minY - 10 - content.height
+        if y < v.minY { y = w.maxY + 10 }
+        x = min(max(x, v.minX + 8), v.maxX - content.width - 8)
+        y = min(max(y, v.minY + 8), v.maxY - content.height)
+        host.panel.setFrameOrigin(NSPoint(x: x - m, y: y - m))
     }
 
     func hide() { host.panel.orderOut(nil) }

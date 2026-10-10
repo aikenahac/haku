@@ -58,7 +58,7 @@ extension Theme {
             chrome: ThemeChrome(widgetRadius: 0, panelRadius: 0, borderWidth: 1, shadow: .none,
                                 showsGlyph: false, micButton: .square, stampOverlay: true,
                                 squareCorners: true, inputWell: false),
-            copy: ThemeCopy(idleName: "Haku", hotkeyHint: "⌥ SPC", placeholder: "Type or hold ⌥ Space",
+            copy: ThemeCopy(idleName: "Haku", hotkeyStyle: .compact, placeholder: "Type or hold {key}",
                             userPrefix: "›", listening: "listening"),
             density: density)
     }
@@ -75,7 +75,7 @@ extension Theme {
             chrome: ThemeChrome(widgetRadius: Radii.widget, panelRadius: Radii.panel, borderWidth: 1,
                                 shadow: .legalPad, bindingWidget: 6, bindingPanel: 10,
                                 showsGlyph: false, inputWell: false),
-            copy: ThemeCopy(placeholder: "write, or hold ⌥ Space"),
+            copy: ThemeCopy(placeholder: "write, or hold {key}"),
             density: density)
     }
 
@@ -93,7 +93,7 @@ extension Theme {
             progress: .bracketHashes, listening: .cursor,
             chrome: ThemeChrome(widgetRadius: Radii.widget, panelRadius: Radii.panel, borderWidth: 1,
                                 shadow: .none, showsGlyph: false, micButton: .bracketText, inputWell: false),
-            copy: ThemeCopy(idleName: "haku", hotkeyHint: "opt+space", placeholder: "type here_",
+            copy: ThemeCopy(idleName: "haku", hotkeyStyle: .words, placeholder: "type here_",
                             userPrefix: ">", headerDate: "dd.MM.yy"),
             density: density)
     }
@@ -110,7 +110,7 @@ extension Theme {
             chrome: ThemeChrome(widgetRadius: Radii.panel, panelRadius: Radii.panel, borderWidth: 1,
                                 shadow: .none, shippingTag: true, showsGlyph: false, stampOverlay: false,
                                 inputWell: false),
-            copy: ThemeCopy(placeholder: "write, or hold ⌥ Space"),
+            copy: ThemeCopy(placeholder: "write, or hold {key}"),
             density: density)
     }
 }

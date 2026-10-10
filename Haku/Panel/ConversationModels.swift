@@ -42,6 +42,17 @@ struct ChatMessage: Identifiable, Equatable, Sendable {
         self.init(role: role, spans: [.text(text)])
     }
 
+    /// Text with `==mark==` and `` `path` `` markup (what's stored in history).
+    var markup: String {
+        spans.map {
+            switch $0 {
+            case .text(let s): s
+            case .mark(let s): "==\(s)=="
+            case .path(let s): "`\(s)`"
+            }
+        }.joined()
+    }
+
     var plainText: String {
         spans.map {
             switch $0 {

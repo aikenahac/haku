@@ -44,11 +44,16 @@ func observe(_ apply: @escaping @MainActor () -> Void) {
 struct ThemedRoot<Content: View>: View {
     @Environment(ThemeManager.self) private var themes
     @Environment(\.colorScheme) private var systemScheme
+    @State private var talkKeys = HotkeyManager.talkKeys
     @ViewBuilder var content: Content
 
     var body: some View {
         content
             .theme(themes.theme)
+            .environment(\.talkKeys, talkKeys)
+            .onReceive(NotificationCenter.default.publisher(for: Notification.Name("KeyboardShortcuts_shortcutByNameDidChange"))) { _ in
+                talkKeys = HotkeyManager.talkKeys
+            }
             .onAppear { themes.systemScheme = systemScheme }
             .onChange(of: systemScheme) { _, s in if themes.mode == .system { themes.systemScheme = s } }
     }
@@ -88,6 +93,8 @@ final class AppWindow {
         if let minSize { window.contentMinSize = minSize }
         window.center()
         window.setFrameAutosaveName("haku.\(title)")
+        // The design draws its own header with a close button.
+        for b in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] { window.standardWindowButton(b)?.isHidden = true }
     }
 
     func show() {

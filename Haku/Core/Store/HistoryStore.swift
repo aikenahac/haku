@@ -23,8 +23,9 @@ final class HistoryStore {
 
     func messages(last n: Int = 60) -> [ChatMessage] {
         entries.suffix(n).map { e in
-            var spans: [MessageSpan] = [.text(e.text)]
-            if !e.marks.isEmpty { spans = MessageSpan.parse(e.text, marks: e.marks) }
+            // `text` keeps the ==mark== / `path` markup so styling survives a relaunch.
+            var spans = MessageSpan.parse(e.text)
+            if !e.marks.isEmpty, !e.text.contains("==") { spans = MessageSpan.parse(e.text, marks: e.marks) }
             let names = e.attachmentNames.map { Attachment(fileName: $0, url: nil, isImage: false) }
             return ChatMessage(id: e.id, role: e.role, spans: spans, attachments: names)
         }
@@ -32,7 +33,7 @@ final class HistoryStore {
 
     func append(_ m: ChatMessage) {
         let marks = m.spans.compactMap { if case .mark(let s) = $0 { s } else { nil } }
-        entries.append(Entry(id: m.id, role: m.role, text: m.plainText, marks: marks,
+        entries.append(Entry(id: m.id, role: m.role, text: m.markup, marks: marks,
                              attachmentNames: m.attachments.map(\.fileName), date: .now))
         if entries.count > limit { entries.removeFirst(entries.count - limit) }
         JSONFile.save(entries, to: url)
@@ -41,7 +42,7 @@ final class HistoryStore {
     func replace(_ m: ChatMessage) {
         guard let i = entries.firstIndex(where: { $0.id == m.id }) else { return append(m) }
         let marks = m.spans.compactMap { if case .mark(let s) = $0 { s } else { nil } }
-        entries[i].text = m.plainText
+        entries[i].text = m.markup
         entries[i].marks = marks
         JSONFile.save(entries, to: url)
     }

@@ -100,6 +100,7 @@ struct WidgetView: View {
 /// The glyph · state text · trailing element row shared by Slip and Index tab.
 struct WidgetContent: View {
     @Environment(\.theme) private var theme
+    @Environment(\.talkKeys) private var talkKeys
     let state: WidgetState
     let metrics: WidgetMetrics
     var hotkeyHint: String?
@@ -138,7 +139,7 @@ struct WidgetContent: View {
         switch state {
         case .idle:
             stateText(theme.copy.idleName).frame(maxWidth: .infinity, alignment: .leading)
-            SmallCaps(text: hotkeyHint ?? theme.copy.hotkeyHint, size: m.smallCaps,
+            SmallCaps(text: hotkeyHint ?? theme.copy.hotkeyHint(talkKeys), size: m.smallCaps,
                       textCase: theme.id == .typewriter ? .lowercase : .uppercase)
 
         case let .listening(level, elapsed):

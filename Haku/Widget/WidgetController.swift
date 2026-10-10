@@ -1,4 +1,8 @@
 import AppKit
+
+extension NSRect {
+    var area: CGFloat { isNull ? 0 : width * height }
+}
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -29,9 +33,15 @@ final class WidgetController {
     var window: NSWindow { host.panel }
 
     func show() {
-        sizeToFit()
-        restorePosition()
         host.panel.orderFrontRegardless()
+        // Size and place after SwiftUI has laid out once, then keep it on screen.
+        DispatchQueue.main.async { [self] in
+            sizeToFit()
+            restorePosition()
+        }
+        NotificationCenter.default.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.clampToScreen() }
+        }
     }
 
     func hide() { host.panel.orderOut(nil) }
@@ -47,20 +57,34 @@ final class WidgetController {
         f.size = size
         f.origin.y = top - size.height   // keep the top edge anchored
         host.panel.setFrame(f, display: true)
+        clampToScreen()
     }
 
     // MARK: Position
 
     private func restorePosition() {
         if let s = UserDefaults.standard.string(forKey: Self.originKey) {
-            let p = NSPointFromString(s)
-            host.panel.setFrameOrigin(p)
-            if NSScreen.screens.contains(where: { $0.visibleFrame.intersects(contentFrame) }) { return }
+            host.panel.setFrameOrigin(NSPointFromString(s))
+        } else if let screen = NSScreen.main {
+            let v = screen.visibleFrame
+            let c = contentFrame.size
+            host.panel.setFrameOrigin(NSPoint(x: v.maxX - c.width - 16 - margin, y: v.maxY - c.height - 16 - margin))
         }
-        guard let screen = NSScreen.main else { return }
+        clampToScreen()
+    }
+
+    /// Pulls the widget fully back onto the screen it overlaps most (or the main screen).
+    func clampToScreen() {
+        let c = contentFrame
+        let screen = NSScreen.screens.max { a, b in
+            a.visibleFrame.intersection(c).area < b.visibleFrame.intersection(c).area
+        }
+        guard let screen = (screen.map { $0.visibleFrame.intersects(c) ? $0 : nil } ?? nil) ?? NSScreen.main else { return }
         let v = screen.visibleFrame
-        let size = host.panel.frame.size
-        host.panel.setFrameOrigin(NSPoint(x: v.maxX - size.width + margin - 16, y: v.maxY - size.height + margin - 16))
+        var o = host.panel.frame.origin
+        o.x = min(max(o.x, v.minX - margin), v.maxX - c.width - margin)
+        o.y = min(max(o.y, v.minY - margin), v.maxY - c.height - margin)
+        if o != host.panel.frame.origin { host.panel.setFrameOrigin(o) }
     }
 
     private func savePosition() {
@@ -101,7 +125,7 @@ final class WidgetController {
     /// Snaps to the nearest screen edge when close; the index tab docks flush.
     private func snapToEdges() {
         let c = contentFrame
-        guard let screen = NSScreen.screens.first(where: { $0.frame.intersects(c) }) ?? NSScreen.main else { return }
+        guard let screen = NSScreen.screens.first(where: { $0.visibleFrame.intersects(c) }) ?? NSScreen.main else { return }
         let v = screen.visibleFrame
         let inset: CGFloat = themes.widgetShape == .indexTab ? 0 : 12
         var o = host.panel.frame.origin
@@ -135,7 +159,6 @@ struct WidgetRootView: View {
     var body: some View {
         ThemedRoot {
             WidgetView(state: model.widgetState, shape: themes.widgetShape, size: themes.widgetSize,
-                       hotkeyHint: HotkeyManager.talkHint,
                        onStop: { model.stopSpeaking() },
                        onFix: { model.fixError() })
                 .scaleEffect(dropTargeted ? 1.04 : 1)

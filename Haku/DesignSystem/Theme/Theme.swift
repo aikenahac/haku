@@ -107,16 +107,46 @@ struct ThemeChrome: Equatable, Sendable {
     var inputWell: Bool = true
 }
 
+/// How the talk hotkey is written in the widget: "⌃⌥ SPACE", "⌃⌥ SPC" or "ctrl+opt+space".
+enum HotkeyHintStyle: Equatable, Sendable { case symbols, compact, words }
+
 struct ThemeCopy: Equatable, Sendable {
     var idleName: String = "Haku"
-    var hotkeyHint: String = "⌥ SPACE"
-    var placeholder: String = "Write, or hold ⌥ Space to speak"
+    var hotkeyStyle: HotkeyHintStyle = .symbols
+    /// `{key}` is replaced with the current talk hotkey.
+    var placeholder: String = "Write, or hold {key} to speak"
     var userPrefix: String = "—"
     var listening: String = "listening"
     var thinking: String = "thinking"
     var speaking: String = "speaking"
     /// Date in the panel header.
     var headerDate: String = "EEE d MMM"
+
+    static let defaultKeys = ["⌃", "⌥", "Space"]
+
+    func hotkeyHint(_ keys: [String]) -> String {
+        let mods = keys.dropLast(), key = keys.last ?? ""
+        switch hotkeyStyle {
+        case .symbols: return mods.joined() + " " + key.uppercased()
+        case .compact: return mods.joined() + " " + (key == "Space" ? "SPC" : key.uppercased())
+        case .words:
+            let names = ["⌃": "ctrl", "⌥": "opt", "⇧": "shift", "⌘": "cmd"]
+            return (mods.map { names[$0] ?? $0 } + [key.lowercased()]).joined(separator: "+")
+        }
+    }
+
+    func placeholder(_ keys: [String]) -> String {
+        placeholder.replacingOccurrences(of: "{key}", with: keys.dropLast().joined() + " " + (keys.last ?? ""))
+    }
+}
+
+private struct TalkKeysKey: EnvironmentKey { static let defaultValue = ThemeCopy.defaultKeys }
+extension EnvironmentValues {
+    /// The current hold-to-talk shortcut, for hints and placeholders.
+    var talkKeys: [String] {
+        get { self[TalkKeysKey.self] }
+        set { self[TalkKeysKey.self] = newValue }
+    }
 }
 
 /// A fully resolved theme: one value per (theme, appearance). Injected via `\.theme`.

@@ -335,13 +335,13 @@ struct WorkflowsRow: View {
     var onRun: (String) -> Void = { _ in }
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: Spacing.s10) {
+        FlowLayout(spacing: Spacing.s10) {
             Text("Workflows:").textRole(.label, theme).foregroundStyle(theme.colors.muted)
             ForEach(workflows, id: \.self) { name in
-                Button(name) { onRun(name) }.buttonStyle(InkLinkStyle())
+                Button(name) { onRun(name) }.buttonStyle(InkLinkStyle()).lineLimit(1).fixedSize()
             }
-            Spacer(minLength: 0)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, PanelMetrics.workflowsPadding.h)
         .padding(.vertical, PanelMetrics.workflowsPadding.v)
     }
@@ -349,6 +349,7 @@ struct WorkflowsRow: View {
 
 struct InputBar: View {
     @Environment(\.theme) private var theme
+    @Environment(\.talkKeys) private var talkKeys
     @Environment(\.staticRendering) private var staticRendering
     @Binding var draft: String
     var actions = PanelActions()
@@ -391,12 +392,12 @@ struct InputBar: View {
 
     @ViewBuilder private var field: some View {
         if staticRendering {
-            Text(draft.isEmpty ? theme.copy.placeholder : draft)
+            Text(draft.isEmpty ? theme.copy.placeholder(talkKeys) : draft)
                 .font(placeholderFont)
                 .foregroundStyle(draft.isEmpty ? theme.colors.muted : theme.colors.ink)
                 .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            TextField("", text: $draft, prompt: Text(theme.copy.placeholder)
+            TextField("", text: $draft, prompt: Text(theme.copy.placeholder(talkKeys))
                 .font(placeholderFont).foregroundColor(theme.colors.muted))
                 .textFieldStyle(.plain)
                 .font(placeholderFont)

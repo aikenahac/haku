@@ -328,9 +328,21 @@ final class AppModel: BrainHost {
             try? await Task.sleep(for: .milliseconds(300))
             do { try await voice.beginListening() } catch { return }
             let deadline = Date.now.addingTimeInterval(10)
-            while !Task.isCancelled, Date.now < deadline, confirmations.current != nil {
-                if confirmations.handleSpoken(voice.partial) { break }
-                try? await Task.sleep(for: .milliseconds(150))
+            let request = confirmations.current?.id
+            var candidate: (String, Date)?
+            while !Task.isCancelled, Date.now < deadline, confirmations.current?.id == request {
+                let heard = voice.partial
+                if ConfirmationCenter.classify(heard) != nil {
+                    // Only act once the recognizer has settled on the same short phrase for half a second.
+                    if let c = candidate, c.0 == heard, Date.now.timeIntervalSince(c.1) > 0.5 {
+                        confirmations.handleSpoken(heard)
+                        break
+                    }
+                    if candidate?.0 != heard { candidate = (heard, .now) }
+                } else {
+                    candidate = nil
+                }
+                try? await Task.sleep(for: .milliseconds(120))
             }
             if voice.isListening { voice.cancelListening() }
         }
@@ -461,10 +473,18 @@ final class AppModel: BrainHost {
 
     func approveEdits(_ id: UUID) {
         guard let job = tasks.job(id), job.status == .awaitingApproval else { return }
+        Log.info("applying approved edits: \(job.title)")
+        // Dismiss a pending "Apply these changes?" slip if the Tasks button was used instead.
+        if case .applyEdits = confirmations.current?.kind { confirmations.deny(source: "superseded") }
         runner.start(id, resume: true)
     }
 
+    @ObservationIgnored private var handledFinishes: Set<String> = []
+
     private func jobFinished(_ job: AgentJob) {
+        // One report per run (a resumed run has a higher approval count).
+        guard handledFinishes.insert("\(job.id)-\(job.approvals)").inserted else { return }
+        Log.info("job finished: \(job.title) → \(job.status.rawValue)")
         attachmentsStore.release(job: job.id)
         // Start the next queued job.
         if let next = tasks.jobs.last(where: { $0.status == .queued }) { startOrQueue(next.id) }
@@ -481,7 +501,7 @@ final class AppModel: BrainHost {
                 let d = await confirm(ConfirmationRequest(
                     kind: .applyEdits(jobTitle: job.title, agent: job.runner.displayName, proposal: job.summary ?? ""),
                     source: "\(job.runner.displayName) · \(job.directory ?? "")", question: "Apply these changes?"))
-                if d.approved { approveEdits(job.id) } else {
+                if d.approved { approveEdits(job.id) } else if tasks.job(job.id)?.status == .awaitingApproval {
                     tasks.update(job.id) { $0.status = .done; $0.log.append(.init(date: .now, text: "changes not applied", kind: .info)) }
                 }
             }

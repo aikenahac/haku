@@ -29,10 +29,10 @@ struct ConfirmSlipView: View {
                         .foregroundStyle(theme.colors.muted)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                Button { center.deny() } label: { HStack(spacing: 8) { Text(request.denyLabel); KbdHint(key: "esc") } }
+                Button { center.deny(source: "button") } label: { HStack(spacing: 8) { Text(request.denyLabel); KbdHint(key: "esc") } }
                     .buttonStyle(InkButtonStyle(kind: .outline, height: 36))
                     .keyboardShortcut(.cancelAction)
-                Button { center.approve() } label: { HStack(spacing: 8) { Text(request.approveLabel); KbdHint(key: "⏎") } }
+                Button { center.approve(source: "button") } label: { HStack(spacing: 8) { Text(request.approveLabel); KbdHint(key: "⏎") } }
                     .buttonStyle(InkButtonStyle(kind: .solid, height: 36))
                     .keyboardShortcut(.defaultAction)
             }
