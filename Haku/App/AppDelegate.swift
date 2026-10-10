@@ -20,6 +20,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         FontRegistry.registerBundledFonts()
+        HotkeyManager.migrateDefaults()   // before any view reads the shortcut
         NSApp.setActivationPolicy(.accessory)
     }
 
