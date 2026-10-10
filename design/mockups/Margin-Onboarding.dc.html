@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Haku · Onboarding</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#24467A}a:hover{color:#1C1E24}
+.hb{--serif:'Newsreader','New York',Georgia,serif;--sans:'Atkinson Hyperlegible',-apple-system,system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-family:var(--sans);color:#1C1E24}
+.hb .light{--desk:#E6E1D4;--paper:#FCFAF4;--paper2:#F3EFE4;--ink:#1C1E24;--mut:#5A5C63;--rule:#DAD3C3;--blue:#24467A;--err:#B3261E;--shadow:0 1px 0 rgba(60,45,20,.06),0 8px 18px -10px rgba(60,45,20,.4)}
+.hb .dark{--desk:#111215;--paper:#1D1E22;--paper2:#26272C;--ink:#ECE8DD;--mut:#A8A498;--rule:#36373D;--blue:#A3BCE6;--err:#FF8F7F;--shadow:0 1px 0 rgba(255,255,255,.03) inset,0 12px 24px -12px rgba(0,0,0,.85)}
+.hb .hl{background:linear-gradient(transparent 52%,var(--hl) 52%,var(--hl) 92%,transparent 92%);color:var(--ink);padding:0 2px}
+.hb .dark .hl{color:#1C1E24;background:var(--hl)}
+.hb .lbl{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--mut)}
+.hb .card{height:480px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px;padding:22px 22px 20px;background:var(--paper);border:1px solid var(--rule);border-radius:4px;box-shadow:var(--shadow);color:var(--ink)}
+.hb .step{display:flex;align-items:center;justify-content:space-between}
+.hb .ill{height:112px;display:flex;align-items:center;justify-content:center;background:var(--paper2);border:1px solid var(--rule)}
+.hb .ill svg{color:var(--ink)}
+.hb h3{margin:0;font-family:var(--serif);font-weight:500;font-size:24px;line-height:1.15}
+.hb p{margin:0;font-family:var(--serif);font-size:15px;line-height:1.5}
+.hb .btn{width:100%;font:700 13px var(--sans);height:38px;border-radius:3px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+.hb .lnk{font-family:var(--serif);font-size:14px;color:var(--blue);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}
+.hb .ok{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--blue);display:flex;align-items:center;gap:6px}
+.hb .foot{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+</style>
+</helmet>
+<div class="hb" style="--hl: {{highlight}}; width: 1600px; min-height: 1380px; box-sizing: border-box; padding: 64px; background: #EFEBE1; display: flex; flex-direction: column; gap: 32px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+<section class="{{m.cls}}" style="background: var(--desk); border-radius: 24px; padding: 32px 40px 40px; display: flex; flex-direction: column; gap: 20px; color: var(--ink)">
+<div class="lbl" style="font-size: 18px">{{m.label}}</div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px">
+
+<div class="card">
+<div class="step"><span class="lbl" style="font-size: 13px">1 of 5</span><svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true"><path d="M2 1v10" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path><path d="M10 1v10M18 1v10M26 1v10M34 1v10" stroke="var(--rule)" stroke-width="1.6" stroke-linecap="round"></path></svg></div>
+<div class="ill"><svg width="64" height="64" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="var(--ink)"></path><rect x="11" y="23" width="24" height="7" fill="var(--hl)" transform="rotate(-3 23 26)"></rect><rect x="12" y="33" width="15" height="2" rx="1" fill="var(--paper)"></rect></svg></div>
+<h3>Hello, I'm <em>Haku</em>.</h3>
+<p>I sit in a corner of your screen and take small jobs: questions, scripts, and handing work to your coding agents. Three permissions and we're done.</p>
+<div class="foot"><button class="btn">Start</button></div>
+</div>
+
+<div class="card">
+<div class="step"><span class="lbl" style="font-size: 13px">2 of 5</span><svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true"><path d="M2 1v10M10 1v10" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path><path d="M18 1v10M26 1v10M34 1v10" stroke="var(--rule)" stroke-width="1.6" stroke-linecap="round"></path></svg></div>
+<div class="ill"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"></path></svg></div>
+<h3>Let me hear you</h3>
+<p>Only while you hold <span style="font-family: var(--mono); font-size: 13px">⌥ Space</span>, or when a prompt is waiting for a yes or no. Nothing listens in the background.</p>
+<div class="foot"><span class="ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>Microphone allowed</span><button class="btn">Continue</button></div>
+</div>
+
+<div class="card">
+<div class="step"><span class="lbl" style="font-size: 13px">3 of 5</span><svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true"><path d="M2 1v10M10 1v10M18 1v10" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path><path d="M26 1v10M34 1v10" stroke="var(--rule)" stroke-width="1.6" stroke-linecap="round"></path></svg></div>
+<div class="ill"><svg width="120" height="48" viewBox="0 0 120 48" aria-hidden="true"><path d="M4 24 C9 12, 13 36, 18 24 S27 10, 32 24 S41 38, 46 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path><path d="M54 24h10M60 19l5 5-5 5" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path><rect x="74" y="20" width="40" height="8" fill="var(--hl)"></rect><path d="M74 34h28" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path><path d="M74 14h36" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path></svg></div>
+<h3>Turn speech into text</h3>
+<p>macOS does the transcribing, on this Mac where it can. You can switch to a local Whisper model later in Settings.</p>
+<div class="foot"><button class="btn">Allow speech recognition</button><button class="lnk">not now</button></div>
+</div>
+
+<div class="card">
+<div class="step"><span class="lbl" style="font-size: 13px">4 of 5</span><svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true"><path d="M2 1v10M10 1v10M18 1v10M26 1v10" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path><path d="M34 1v10" stroke="var(--rule)" stroke-width="1.6" stroke-linecap="round"></path></svg></div>
+<div class="ill"><svg width="120" height="64" viewBox="0 0 120 64" aria-hidden="true"><rect x="8" y="8" width="70" height="46" rx="3" fill="none" stroke="var(--ink)" stroke-width="1.4"></rect><path d="M8 18h70" stroke="var(--ink)" stroke-width="1.4"></path><rect x="54" y="30" width="58" height="28" rx="2" fill="var(--paper)" stroke="var(--ink)" stroke-width="1.4"></rect><path d="M62 44h22" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"></path><rect x="92" y="39" width="14" height="10" rx="5" fill="var(--ink)"></rect><circle cx="101" cy="44" r="3.5" fill="var(--paper)"></circle></svg></div>
+<h3>Work in any app</h3>
+<p>Accessibility lets the hotkey work everywhere and lets me read the front window when you ask “what's this?”. Flip Haku on in System Settings, then come back.</p>
+<div class="foot"><span class="lbl" style="font-size: 13px">waiting for System Settings…</span><button class="btn">Open System Settings</button></div>
+</div>
+
+<div class="card">
+<div class="step"><span class="lbl" style="font-size: 13px">5 of 5</span><svg width="40" height="12" viewBox="0 0 40 12" aria-hidden="true"><path d="M2 1v10M10 1v10M18 1v10M26 1v10M34 1v10" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path></svg></div>
+<div class="ill" style="flex-direction: column; gap: 10px"><div style="width: 180px; height: 40px; box-sizing: border-box; display: flex; align-items: center; gap: 8px; padding: 0 10px; background: var(--paper); border: 1px solid var(--rule); border-radius: 3px; box-shadow: var(--shadow)"><svg width="16" height="16" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="var(--ink)"></path></svg><span style="font-family: var(--serif); font-style: italic; font-size: 15px; flex: 1">Haku</span><span style="font-size: 10px; letter-spacing: .06em; color: var(--mut)">⌥ SPACE</span></div><span class="lbl" style="font-size: 12px">drag me anywhere</span></div>
+<h3>Try it</h3>
+<p>Hold <span style="font-family: var(--mono); font-size: 13px">⌥ Space</span> and say <span class="hl"><em>“what can you do?”</em></span> or <span class="hl"><em>“run the tests in devenv”</em></span>.</p>
+<div class="foot"><button class="btn">Done</button></div>
+</div>
+
+</div>
+</section>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"highlight":{"editor":"color","default":"#F4D24C","options":["#F4D24C","#9FE0B4","#F7A9BE","#9CC8F2"]},"$preview":{"width":1600,"height":1380}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      highlight: this.props.highlight ?? '#F4D24C',
+      modes: [{ cls: 'light', label: 'Light' }, { cls: 'dark', label: 'Dark' }]
+    };
+  }
+}
+</script>
+</body>
+</html>

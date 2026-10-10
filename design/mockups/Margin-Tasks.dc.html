@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Haku · Tasks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#24467A}a:hover{color:#1C1E24}
+.hb{--serif:'Newsreader','New York',Georgia,serif;--sans:'Atkinson Hyperlegible',-apple-system,system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-family:var(--sans);color:#1C1E24}
+.hb .light{--desk:#E6E1D4;--paper:#FCFAF4;--paper2:#F3EFE4;--ink:#1C1E24;--mut:#5A5C63;--rule:#DAD3C3;--blue:#24467A;--margin:#E2B4AC;--err:#B3261E;--shadow:0 1px 0 rgba(60,45,20,.06),0 8px 18px -10px rgba(60,45,20,.4)}
+.hb .dark{--desk:#111215;--paper:#1D1E22;--paper2:#26272C;--ink:#ECE8DD;--mut:#A8A498;--rule:#36373D;--blue:#A3BCE6;--margin:#5A3A38;--err:#FF8F7F;--shadow:0 1px 0 rgba(255,255,255,.03) inset,0 12px 24px -12px rgba(0,0,0,.85)}
+.hb .t{font-family:var(--serif);font-style:italic;line-height:1.1}
+.hb .hl{background:linear-gradient(transparent 52%,var(--hl) 52%,var(--hl) 92%,transparent 92%);color:var(--ink);padding:0 2px}
+.hb .dark .hl{color:#1C1E24;background:var(--hl);border-radius:1px}
+.hb .sc{font-family:var(--sans);font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
+.hb .lbl{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--mut)}
+.hb .mono{font-family:var(--mono);font-size:12px}
+.hb .ib{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--mut);border-radius:4px;padding:0;cursor:pointer}
+.hb .ib svg{width:16px;height:16px}
+.hb .lnk{font-family:var(--serif);font-size:14px;color:var(--blue);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}
+.hb .tab{font-family:var(--serif);font-size:14px;color:var(--mut);background:none;border:0;padding:4px 0;cursor:pointer}
+.hb .tab.on{color:var(--ink);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:6px}
+.hb .row{display:flex;flex-direction:column;gap:4px;text-align:left;width:100%;padding:12px 14px 12px 16px;border:0;border-bottom:1px solid var(--rule);background:transparent;color:var(--ink);cursor:pointer}
+.hb .row.sel{background:var(--paper2)}
+.hb .row .tt{font-family:var(--serif);font-size:15px;line-height:1.3}
+.hb .row .dir{font-family:var(--mono);font-size:10.5px;color:var(--mut)}
+.hb .st{font-family:var(--serif);font-style:italic;font-size:13px}
+.hb .st.run{color:var(--blue)}
+.hb .st.done{color:var(--mut)}
+.hb .st.fail{color:var(--err);text-decoration:underline wavy var(--err);text-underline-offset:4px}
+.hb .btn{font:700 13px var(--sans);height:32px;padding:0 14px;border-radius:3px;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.hb .btn.solid{background:var(--ink);color:var(--paper)}
+.hb .btn.warn{border-color:var(--err);color:var(--err)}
+.hb .step{display:flex;align-items:baseline;gap:10px;font-family:var(--serif);font-size:15px}
+.hb .step .n{font-family:var(--mono);font-size:11px;color:var(--mut);width:18px;flex:none}
+.hb .step.done{color:var(--mut);text-decoration:line-through;text-decoration-color:var(--rule)}
+.hb .step.now .n{color:var(--blue)}
+.hb .log{font-family:var(--mono);font-size:11.5px;line-height:1.7;background:var(--paper2);border:1px solid var(--rule);padding:10px 12px;color:var(--ink)}
+.hb .log .ts{color:var(--mut)}
+.hb .log .x{color:var(--err)}
+</style>
+</helmet>
+<div class="hb" style="--hl: {{highlight}}; width: 1600px; min-height: 1020px; box-sizing: border-box; padding: 64px; background: #EFEBE1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+<section class="{{m.cls}}" style="background: var(--desk); border-radius: 24px; padding: 40px; display: flex; flex-direction: column; gap: 24px; color: var(--ink)">
+<div class="lbl" style="font-size: 18px">{{m.label}}</div>
+
+<div style="height: 780px; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden">
+<div style="flex: none; height: 54px; display: flex; align-items: center; gap: 18px; padding: 0 10px 0 18px; border-bottom: 1px solid var(--rule)">
+<span class="t" style="font-size: 22px">Tasks</span>
+<nav style="flex: 1; display: flex; gap: 16px">
+<button class="tab on">Running 2</button>
+<button class="tab">Done 12</button>
+<button class="tab">Failed 1</button>
+<button class="tab">All</button>
+</nav>
+<button class="ib" aria-label="Close tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"></path></svg></button>
+</div>
+
+<div style="flex: 1; min-height: 0; display: grid; grid-template-columns: 236px minmax(0, 1fr)">
+<div style="border-right: 1px solid var(--rule); overflow: hidden">
+<sc-for list="{{m.tasks}}" as="t" hint-placeholder-count="5">
+<button class="row {{t.sel}}"><span class="sc" style="font-size: 10px">{{t.agent}}</span><span class="tt">{{t.title}}</span><span class="dir">{{t.dir}}</span><span class="st {{t.kind}}">{{t.st}}</span></button>
+</sc-for>
+</div>
+
+<div style="min-width: 0; overflow: hidden; padding: 20px 22px; display: flex; flex-direction: column; gap: 18px">
+<sc-if value="{{m.isRun}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="sc" style="color: var(--blue)">Claude Code · running</span>
+<span style="font-family: var(--serif); font-size: 24px; line-height: 1.15">Run devenv tests, report failures</span>
+</div>
+<dl style="margin: 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 6px 12px; font-size: 13px">
+<dt class="lbl" style="font-size: 13px">Working dir</dt><dd class="mono" style="margin: 0">~/code/devenv</dd>
+<dt class="lbl" style="font-size: 13px">Started</dt><dd style="margin: 0">14:02 · 1m 12s ago</dd>
+<dt class="lbl" style="font-size: 13px">Asked</dt><dd style="margin: 0; font-family: var(--serif); font-style: italic">“Run the devenv tests and tell me what's failing.”</dd>
+<dt class="lbl" style="font-size: 13px">Permissions</dt><dd style="margin: 0">Ask before editing files</dd>
+</dl>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px">
+<li class="step done"><span class="n">1</span>Read compose files and package.json</li>
+<li class="step done"><span class="n">2</span>Install dependencies</li>
+<li class="step now"><span class="n">3</span><span class="hl">Run bun test</span></li>
+<li class="step"><span class="n">4</span>Look into the failures</li>
+<li class="step"><span class="n">5</span>Write a summary</li>
+</ol>
+<div style="display: flex; align-items: baseline; justify-content: space-between"><span class="lbl">Live log</span><button class="lnk" style="font-size: 13px">follow</button></div>
+<div class="log"><span class="ts">14:03:10</span> $ bun test<br><span class="ts">14:03:21</span> ✓ stack.spec.ts (12)<br><span class="ts">14:03:24</span> ✓ env.spec.ts (29)<br><span class="ts">14:03:26</span> <span class="x">✗ compose.spec.ts › merges overrides</span><br><span class="ts">14:03:26</span> <span class="x">✗ compose.spec.ts › resolves profiles</span><br><span class="ts">14:03:27</span> <span class="x">✗ compose.spec.ts › network names</span><br><span class="ts">14:03:27</span> 41 passed, 3 failed<br><span class="ts">14:03:29</span> reading src/compose/merge.ts…</div>
+<div style="display: flex; gap: 8px; margin-top: auto"><button class="btn warn">Cancel</button><button class="btn">Open in Terminal</button></div>
+</sc-if>
+
+<sc-if value="{{m.isDone}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="sc">Claude Code · done in 9m</span>
+<span style="font-family: var(--serif); font-size: 24px; line-height: 1.15">Bump Keycloak to 26.x and fix realm import</span>
+</div>
+<dl style="margin: 0; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 6px 12px; font-size: 13px">
+<dt class="lbl" style="font-size: 13px">Working dir</dt><dd class="mono" style="margin: 0">~/code/infra</dd>
+<dt class="lbl" style="font-size: 13px">Ran</dt><dd style="margin: 0">14:22 – 14:31</dd>
+<dt class="lbl" style="font-size: 13px">Permissions</dt><dd style="margin: 0">Ask before editing files · 2 approvals</dd>
+</dl>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span class="lbl">Summary</span>
+<p style="margin: 0; font-family: var(--serif); font-size: 16px; line-height: 1.5">Bumped the Keycloak image in docker-compose.yml. The realm import was failing on a renamed field, so I updated <span class="mono" style="font-size: 13px">realm-export.json</span> and <span class="hl">the import passes locally</span>. Nothing committed or pushed.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="lbl">Changed</span>
+<div class="log" style="line-height: 1.8">M docker-compose.yml<br>M realm-export.json<br>M .env.example<br>M README.md</div>
+</div>
+<div style="display: flex; gap: 8px; margin-top: auto; flex-wrap: wrap"><button class="btn solid">Open diff</button><button class="btn">Copy summary</button><button class="btn">Run again</button></div>
+</sc-if>
+</div>
+</div>
+</div>
+</section>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"highlight":{"editor":"color","default":"#F4D24C","options":["#F4D24C","#9FE0B4","#F7A9BE","#9CC8F2"]},"$preview":{"width":1600,"height":1020}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const base = [
+      { agent: 'Claude Code', title: 'Run devenv tests, report failures', dir: '~/code/devenv', st: 'running · step 3 of 5', kind: 'run' },
+      { agent: 'Codex', title: 'Add a healthcheck to the Garage compose file', dir: '~/code/homelab', st: 'running · step 1 of 3', kind: 'run' },
+      { agent: 'Claude Code', title: 'Bump Keycloak to 26.x and fix realm import', dir: '~/code/infra', st: 'done · 14:31', kind: 'done' },
+      { agent: 'Codex', title: 'Migration for the members table', dir: '~/code/pirati-web', st: 'failed · exit 1 · retry?', kind: 'fail' },
+      { agent: 'Gemma · local', title: 'Summarize clipboard into five bullets', dir: 'no working dir', st: 'done · 13:58', kind: 'done' }
+    ];
+    const pick = (i) => base.map((t, j) => Object.assign({}, t, { sel: i === j ? 'sel' : '' }));
+    return {
+      highlight: this.props.highlight ?? '#F4D24C',
+      modes: [
+        { cls: 'light', label: 'Light — a running job', tasks: pick(0), isRun: true, isDone: false },
+        { cls: 'dark', label: 'Dark — a finished job', tasks: pick(2), isRun: false, isDone: true }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

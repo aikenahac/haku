@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Haku · Workflows</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#24467A}a:hover{color:#1C1E24}
+.hb{--serif:'Newsreader','New York',Georgia,serif;--sans:'Atkinson Hyperlegible',-apple-system,system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-family:var(--sans);color:#1C1E24}
+.hb .light{--desk:#E6E1D4;--paper:#FCFAF4;--paper2:#F3EFE4;--ink:#1C1E24;--mut:#5A5C63;--rule:#DAD3C3;--blue:#24467A;--err:#B3261E;--shadow:0 1px 0 rgba(60,45,20,.06),0 8px 18px -10px rgba(60,45,20,.4)}
+.hb .dark{--desk:#111215;--paper:#1D1E22;--paper2:#26272C;--ink:#ECE8DD;--mut:#A8A498;--rule:#36373D;--blue:#A3BCE6;--err:#FF8F7F;--shadow:0 1px 0 rgba(255,255,255,.03) inset,0 12px 24px -12px rgba(0,0,0,.85)}
+.hb .t{font-family:var(--serif);font-style:italic;line-height:1.1}
+.hb .hl{background:linear-gradient(transparent 52%,var(--hl) 52%,var(--hl) 92%,transparent 92%);color:var(--ink);padding:0 2px}
+.hb .dark .hl{color:#1C1E24;background:var(--hl)}
+.hb .lbl{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--mut)}
+.hb .sc{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.hb .lnk{font-family:var(--serif);font-size:14px;color:var(--blue);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}
+.hb .item{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--rule);background:transparent;color:var(--ink);padding:11px 14px;cursor:pointer}
+.hb .item.sel{background:var(--paper2)}
+.hb .item .nm{font-family:var(--serif);font-size:15px}
+.hb .item .ph{font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--mut)}
+.hb .f{display:grid;grid-template-columns:104px minmax(0,1fr);gap:8px 14px;align-items:start}
+.hb .f > .lbl{padding-top:6px}
+.hb .phr{font-family:var(--serif);font-style:italic;font-size:14px;border:1px solid var(--rule);border-radius:3px;padding:4px 8px;background:var(--paper2);color:var(--ink);display:flex;align-items:center;gap:6px}
+.hb .phr button{border:0;background:none;color:var(--mut);padding:0;font-size:13px;cursor:pointer}
+.hb .seg{display:flex;border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.hb .seg button{flex:1;height:30px;border:0;border-right:1px solid var(--rule);background:transparent;color:var(--mut);font:13px var(--sans);cursor:pointer;padding:0 10px}
+.hb .seg button:last-child{border-right:0}
+.hb .seg button.on{background:var(--paper2);color:var(--ink);font-weight:700}
+.hb .var{font-family:var(--mono);font-size:11.5px;color:var(--blue);border:1px dashed var(--blue);border-radius:3px;padding:1px 5px;background:transparent;cursor:pointer}
+.hb .btn{font:700 13px var(--sans);height:34px;padding:0 14px;border-radius:3px;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;display:flex;align-items:center;gap:8px}
+.hb .btn.solid{background:var(--ink);color:var(--paper)}
+.hb .chk{display:flex;align-items:center;gap:8px;font-size:13px}
+.hb .chk input{width:15px;height:15px;margin:0;accent-color:var(--ink)}
+.hb .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</helmet>
+<div class="hb" style="--hl: {{highlight}}; width: 1600px; min-height: 1020px; box-sizing: border-box; padding: 64px; background: #EFEBE1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+<section class="{{m.cls}}" style="background: var(--desk); border-radius: 24px; padding: 40px; display: flex; flex-direction: column; gap: 24px; color: var(--ink)">
+<div class="lbl" style="font-size: 18px">{{m.label}}</div>
+<div style="height: 780px; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden">
+<div style="flex: none; height: 54px; display: flex; align-items: center; gap: 12px; padding: 0 16px 0 18px; border-bottom: 1px solid var(--rule)">
+<span class="t" style="font-size: 22px; flex: 1">Workflows</span>
+<button class="lnk">+ new workflow</button>
+</div>
+<div style="flex: 1; min-height: 0; display: grid; grid-template-columns: 196px minmax(0, 1fr)">
+<div style="border-right: 1px solid var(--rule); overflow: hidden">
+<sc-for list="{{flows}}" as="w" hint-placeholder-count="5">
+<button class="item {{w.sel}}"><span class="nm">{{w.name}}</span><span class="ph">“{{w.phrase}}”</span></button>
+</sc-for>
+</div>
+<div style="min-width: 0; padding: 20px 22px; display: flex; flex-direction: column; gap: 18px; overflow: hidden">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<label class="sc" for="wf-name-{{m.cls}}">Workflow</label>
+<input id="wf-name-{{m.cls}}" value="Deploy staging" style="font-family: var(--serif); font-size: 26px; border: 0; border-bottom: 1px solid var(--rule); background: transparent; color: var(--ink); padding: 2px 0 6px; outline: none">
+</div>
+
+<div class="f">
+<span class="lbl">When I say</span>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+<span class="phr">deploy staging<button aria-label="Remove phrase">×</button></span>
+<span class="phr">ship it to staging<button aria-label="Remove phrase">×</button></span>
+<span class="phr">push staging<button aria-label="Remove phrase">×</button></span>
+<button class="lnk" style="font-size: 13px">+ phrase</button>
+</div>
+<label class="chk" style="color: var(--mut)"><input type="checkbox" checked>Also match similar wording</label>
+</div>
+
+<span class="lbl">Do this</span>
+<div class="seg" role="group" aria-label="Action type"><button>Ask model</button><button>Shell</button><button>Script</button><button class="on">Agent</button></div>
+
+<span class="lbl">Agent</span>
+<div class="seg" role="group" aria-label="Agent" style="max-width: 240px"><button class="on">Claude Code</button><button>Codex</button></div>
+
+<span class="lbl">Folder</span>
+<span style="padding-top: 5px"><span style="font-family: var(--mono); font-size: 12.5px">~/code/homelab</span> <button class="lnk" style="font-size: 13px; margin-left: 8px">change</button></span>
+
+<label class="lbl" for="wf-task-{{m.cls}}">Task</label>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="position: relative">
+<textarea id="wf-task-{{m.cls}}" class="sr">Pull main, run deploy-staging.sh, check the staging URL answers, then tell me what changed. {after}</textarea>
+<div aria-hidden="true" style="min-height: 96px; box-sizing: border-box; border: 1px solid var(--rule); background: var(--paper2); padding: 10px 12px; font-family: var(--serif); font-size: 15px; line-height: 1.5">Pull main, run <span style="font-family: var(--mono); font-size: 12.5px">deploy-staging.sh</span>, check the staging URL answers, then tell me what changed. <span class="var">{after}</span></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span class="lbl" style="font-size: 13px">insert</span><button class="var">{after}</button><button class="var">{clipboard}</button><button class="var">{selection}</button><button class="var">{front app}</button><button class="var">{date}</button></div>
+<span class="lbl" style="font-size: 12.5px"><span class="var" style="cursor: default">{after}</span> is whatever you say after the phrase — “deploy staging <span class="hl">and skip the tests</span>”.</span>
+</div>
+
+<span class="lbl">Safety</span>
+<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 5px">
+<label class="chk"><input type="checkbox" checked>Confirm before running</label>
+<label class="chk"><input type="checkbox">Allow file edits without asking</label>
+</div>
+
+<span class="lbl">Hotkey</span>
+<span style="padding-top: 5px"><button class="lnk" style="font-size: 13px">record a shortcut</button></span>
+</div>
+
+<div style="margin-top: auto; display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--rule); padding-top: 14px">
+<button class="lnk" style="color: var(--err); flex: 1; text-align: left">delete</button>
+<button class="btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>Try it by voice</button>
+<button class="btn solid">Save</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"highlight":{"editor":"color","default":"#F4D24C","options":["#F4D24C","#9FE0B4","#F7A9BE","#9CC8F2"]},"$preview":{"width":1600,"height":1020}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const flows = [
+      { name: 'Standup notes', phrase: 'morning notes' },
+      { name: 'Deploy staging', phrase: 'deploy staging', sel: 'sel' },
+      { name: 'Tidy Downloads', phrase: 'clean up downloads' },
+      { name: 'Summarize clipboard', phrase: 'sum this up' },
+      { name: 'Review my branch', phrase: 'review this branch' }
+    ].map((w) => Object.assign({ sel: '' }, w));
+    return {
+      highlight: this.props.highlight ?? '#F4D24C',
+      flows: flows,
+      modes: [{ cls: 'light', label: 'Light' }, { cls: 'dark', label: 'Dark' }]
+    };
+  }
+}
+</script>
+</body>
+</html>

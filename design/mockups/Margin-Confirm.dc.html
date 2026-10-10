@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Haku · Confirmation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#24467A}a:hover{color:#1C1E24}
+.hb{--serif:'Newsreader','New York',Georgia,serif;--sans:'Atkinson Hyperlegible',-apple-system,system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-family:var(--sans);color:#1C1E24}
+.hb .light{--desk:#E6E1D4;--paper:#FCFAF4;--paper2:#F3EFE4;--ink:#1C1E24;--mut:#5A5C63;--rule:#DAD3C3;--blue:#24467A;--err:#B3261E;--shadow:0 1px 0 rgba(60,45,20,.06),0 8px 18px -10px rgba(60,45,20,.4)}
+.hb .dark{--desk:#111215;--paper:#1D1E22;--paper2:#26272C;--ink:#ECE8DD;--mut:#A8A498;--rule:#36373D;--blue:#A3BCE6;--err:#FF8F7F;--shadow:0 1px 0 rgba(255,255,255,.03) inset,0 12px 24px -12px rgba(0,0,0,.85)}
+.hb .t{font-family:var(--serif);font-style:italic;line-height:1.1}
+.hb .hl{background:linear-gradient(transparent 52%,var(--hl) 52%,var(--hl) 92%,transparent 92%);color:var(--ink);padding:0 2px}
+.hb .dark .hl{color:#1C1E24;background:var(--hl)}
+.hb .sc{font-family:var(--sans);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.hb .lbl{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--mut)}
+.hb .card{display:flex;flex-direction:column;gap:14px;background:var(--paper);border:1px solid var(--rule);border-top:2px dashed var(--rule);border-radius:0 0 4px 4px;box-shadow:var(--shadow);padding:18px 20px 16px;color:var(--ink)}
+.hb .code{font-family:var(--mono);font-size:12px;line-height:1.65;background:var(--paper2);border:1px solid var(--rule);padding:10px 12px;white-space:pre-wrap;word-break:break-word}
+.hb .lnk{font-family:var(--serif);font-size:14px;color:var(--blue);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}
+.hb .btn{display:flex;align-items:center;gap:8px;font:700 13px var(--sans);height:36px;padding:0 12px 0 14px;border-radius:3px;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.hb .btn.solid{background:var(--ink);color:var(--paper)}
+.hb .kbd{font:500 10px var(--mono);border:1px solid currentColor;border-radius:3px;padding:1px 4px;opacity:.75}
+.hb .chk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mut)}
+.hb .chk input{width:15px;height:15px;margin:0;accent-color:var(--ink)}
+.hb .seg{display:flex;border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.hb .seg button{flex:1;height:30px;border:0;border-right:1px solid var(--rule);background:transparent;color:var(--mut);font:13px var(--sans);cursor:pointer}
+.hb .seg button:last-child{border-right:0}
+.hb .seg button.on{background:var(--paper2);color:var(--ink);font-weight:700}
+.hb .voice{display:flex;align-items:center;gap:8px}
+@media (prefers-reduced-motion: no-preference){.hb .write{stroke-dasharray:80;animation:write 1.6s ease-in-out infinite}}
+@keyframes write{0%{stroke-dashoffset:80}60%,100%{stroke-dashoffset:0}}
+</style>
+</helmet>
+<div class="hb" style="--hl: {{highlight}}; width: 1600px; min-height: 1180px; box-sizing: border-box; padding: 64px; background: #EFEBE1; display: flex; flex-direction: column; gap: 32px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+<section class="{{m.cls}}" style="background: var(--desk); border-radius: 24px; padding: 36px 40px 40px; display: flex; flex-direction: column; gap: 22px; color: var(--ink)">
+<div class="lbl" style="font-size: 18px">{{m.label}}</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; align-items: start">
+
+<div class="card">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="sc">Shell command · workflow “Tidy Downloads”</span><span class="t" style="font-size: 22px">Run this command?</span></div>
+<div class="code">find ~/Downloads -name "*.dmg" -mtime +30 -delete</div>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">
+<span style="color: var(--err); text-decoration: underline wavy var(--err); text-underline-offset: 4px; font-family: var(--serif); font-style: italic; font-size: 15px; align-self: flex-start">Permanently deletes 7 files</span>
+<span style="color: var(--mut)">in <span style="font-family: var(--mono); font-size: 12px">~/Downloads</span> · <button class="lnk" style="font-size: 13px">list them</button></span>
+</div>
+<label class="chk"><input type="checkbox">Don't ask again for this workflow</label>
+<div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--rule); padding-top: 14px">
+<span class="voice" style="flex: 1"><svg width="36" height="16" viewBox="0 0 36 16" aria-hidden="true"><path class="write" d="M1 8 C4 2, 6 14, 9 8 S14 2, 17 8 S22 14, 25 8 S30 4, 35 8" fill="none" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"></path></svg><span class="lbl" style="font-size: 13px">say “yes” or “no”</span></span>
+<button class="btn">Deny <span class="kbd">esc</span></button>
+<button class="btn solid">Run <span class="kbd">⏎</span></button>
+</div>
+</div>
+
+<div class="card">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="sc">Script · deploy-staging.sh</span><span class="t" style="font-size: 22px">Run this script?</span></div>
+<div class="code">#!/usr/bin/env bash
+set -euo pipefail
+cd ~/code/homelab
+docker compose -f staging.yml pull
+docker compose -f staging.yml up -d</div>
+<div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--mut)">
+<span>in <span style="font-family: var(--mono); font-size: 12px">~/code/homelab</span> · touches network · <button class="lnk" style="font-size: 13px">all 24 lines</button></span>
+</div>
+<label class="chk"><input type="checkbox">Don't ask again for this script</label>
+<div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--rule); padding-top: 14px">
+<span class="voice" style="flex: 1"><svg width="36" height="16" viewBox="0 0 36 16" aria-hidden="true"><path class="write" d="M1 8 C4 2, 6 14, 9 8 S14 2, 17 8 S22 14, 25 8 S30 4, 35 8" fill="none" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"></path></svg><span class="lbl" style="font-size: 13px">say “yes” or “no”</span></span>
+<button class="btn">Deny <span class="kbd">esc</span></button>
+<button class="btn solid">Run <span class="kbd">⏎</span></button>
+</div>
+</div>
+
+<div class="card">
+<div style="display: flex; flex-direction: column; gap: 6px"><span class="sc">Agent delegation</span><span class="t" style="font-size: 22px">Hand this to Claude Code?</span></div>
+<p style="margin: 0; font-family: var(--serif); font-style: italic; font-size: 16px; line-height: 1.4">“<span class="hl">Run the devenv tests</span> and tell me what's failing.”</p>
+<div style="display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 8px 10px; align-items: center; font-size: 13px">
+<span class="lbl" style="font-size: 13px">Agent</span><span>Claude Code <button class="lnk" style="font-size: 13px; margin-left: 6px">switch to Codex</button></span>
+<span class="lbl" style="font-size: 13px">Folder</span><span><span style="font-family: var(--mono); font-size: 12px">~/code/devenv</span> <button class="lnk" style="font-size: 13px; margin-left: 6px">change</button></span>
+<span class="lbl" style="font-size: 13px">Edits</span>
+<div class="seg" role="group" aria-label="Edit permissions"><button>Read only</button><button class="on">Ask first</button><button>Allowed</button></div>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--rule); padding-top: 14px">
+<span class="voice" style="flex: 1"><svg width="36" height="16" viewBox="0 0 36 16" aria-hidden="true"><path class="write" d="M1 8 C4 2, 6 14, 9 8 S14 2, 17 8 S22 14, 25 8 S30 4, 35 8" fill="none" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"></path></svg><span class="lbl" style="font-size: 13px">say “send it”</span></span>
+<button class="btn">Not now <span class="kbd">esc</span></button>
+<button class="btn solid">Send <span class="kbd">⏎</span></button>
+</div>
+</div>
+
+</div>
+</section>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"highlight":{"editor":"color","default":"#F4D24C","options":["#F4D24C","#9FE0B4","#F7A9BE","#9CC8F2"]},"$preview":{"width":1600,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      highlight: this.props.highlight ?? '#F4D24C',
+      modes: [{ cls: 'light', label: 'Light' }, { cls: 'dark', label: 'Dark' }]
+    };
+  }
+}
+</script>
+</body>
+</html>

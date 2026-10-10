@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Haku · B · Margin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#24467A}a:hover{color:#1C1E24}
+.hb{--serif:'Newsreader','New York',Georgia,serif;--sans:'Atkinson Hyperlegible',-apple-system,system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-family:var(--sans);color:#1C1E24}
+.hb .light{--desk:#E6E1D4;--paper:#FCFAF4;--paper2:#F3EFE4;--ink:#1C1E24;--mut:#5A5C63;--rule:#DAD3C3;--blue:#24467A;--margin:#E2B4AC;--err:#B3261E;--shadow:0 1px 0 rgba(60,45,20,.06),0 8px 18px -10px rgba(60,45,20,.4)}
+.hb .dark{--desk:#111215;--paper:#1D1E22;--paper2:#26272C;--ink:#ECE8DD;--mut:#A8A498;--rule:#36373D;--blue:#A3BCE6;--margin:#5A3A38;--err:#FF8F7F;--shadow:0 1px 0 rgba(255,255,255,.03) inset,0 12px 24px -12px rgba(0,0,0,.85)}
+.hb .w{position:relative;width:252px;height:46px;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:0 14px 0 12px;background:var(--paper);border:1px solid var(--rule);border-radius:3px;box-shadow:var(--shadow);color:var(--ink)}
+.hb .t{font-family:var(--serif);font-style:italic;font-size:17px;line-height:1}
+.hb .hl{background:linear-gradient(transparent 52%,var(--hl) 52%,var(--hl) 92%,transparent 92%);color:var(--ink);padding:0 2px}
+.hb .dark .hl{color:#1C1E24;background:var(--hl);border-radius:1px}
+.hb .sc{font-family:var(--sans);font-size:11px;letter-spacing:.06em;color:var(--mut)}
+.hb .dots{display:flex;gap:4px}
+.hb .dots i{width:4px;height:4px;border-radius:50%;background:var(--ink);display:block}
+.hb .stamp{position:absolute;top:-10px;right:-10px;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--blue);color:var(--blue);background:var(--paper);font:700 11px/21px var(--sans);text-align:center;transform:rotate(-10deg)}
+.hb .lbl{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--mut)}
+.hb .ib{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--mut);border-radius:4px;padding:0;cursor:pointer}
+.hb .ib:hover{color:var(--ink);background:var(--paper2)}
+.hb .ib svg{width:16px;height:16px}
+.hb .lnk{font-family:var(--serif);font-size:14px;color:var(--blue);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}
+.hb .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion: no-preference){
+.hb.motion .dots i{animation:ink 1.2s ease-in-out infinite}
+.hb.motion .dots i:nth-child(2){animation-delay:.2s}
+.hb.motion .dots i:nth-child(3){animation-delay:.4s}
+.hb.motion .write{stroke-dasharray:120;animation:write 1.6s ease-in-out infinite}
+.hb.motion .under{stroke-dasharray:70;animation:write 2.2s ease-in-out infinite}
+}
+@keyframes ink{0%,100%{opacity:.2}40%{opacity:1}}
+@keyframes write{0%{stroke-dashoffset:120}60%,100%{stroke-dashoffset:0}}
+</style>
+</helmet>
+<div class="hb {{motionCls}}" style="--hl: {{highlight}}; width: 1600px; min-height: 1640px; box-sizing: border-box; padding: 64px; background: #EFEBE1; display: flex; flex-direction: column; gap: 48px">
+
+<header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px">
+<div style="display: flex; align-items: center; gap: 24px">
+<svg width="88" height="88" viewBox="0 0 48 48" role="img" aria-label="Haku mark"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="#1C1E24"></path><rect x="11" y="23" width="24" height="7" fill="{{highlight}}" transform="rotate(-3 23 26)"></rect><rect x="12" y="33" width="15" height="2" rx="1" fill="#FCFAF4"></rect></svg>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 96px; line-height: .85; letter-spacing: -0.02em">Ha<span style="background: linear-gradient(transparent 55%, var(--hl) 55%, var(--hl) 88%, transparent 88%)">ku</span></div>
+<div style="font-size: 12px; letter-spacing: .14em; color: #5A5C63">B — MARGIN · PAPER &amp; INK</div>
+</div>
+</div>
+<div style="display: flex; align-items: flex-end; gap: 20px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+<svg width="64" height="64" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#FCFAF4" stroke="#DAD3C3"></rect><path d="M11 15h8l2.5-3H37a1.5 1.5 0 0 1 1.5 1.5v21A1.5 1.5 0 0 1 37 36H11a1.5 1.5 0 0 1-1.5-1.5v-18A1.5 1.5 0 0 1 11 15z" fill="#1C1E24"></path><rect x="13" y="22" width="20" height="6" fill="{{highlight}}" transform="rotate(-3 23 25)"></rect></svg>
+<span style="font-size: 10px; letter-spacing: .1em; color: #5A5C63">APP · LIGHT</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+<svg width="64" height="64" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#1D1E22"></rect><path d="M11 15h8l2.5-3H37a1.5 1.5 0 0 1 1.5 1.5v21A1.5 1.5 0 0 1 37 36H11a1.5 1.5 0 0 1-1.5-1.5v-18A1.5 1.5 0 0 1 11 15z" fill="#ECE8DD"></path><rect x="13" y="22" width="20" height="6" fill="{{highlight}}" transform="rotate(-3 23 25)"></rect></svg>
+<span style="font-size: 10px; letter-spacing: .1em; color: #5A5C63">APP · DARK</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+<div style="height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 14px; background: #E6E1D4; border-radius: 8px">
+<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="none" stroke="#1C1E24" stroke-width="4"></path></svg>
+<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="#1C1E24"></path></svg>
+</div>
+<span style="font-size: 10px; letter-spacing: .1em; color: #5A5C63">MENU BAR · IDLE / LIVE</span>
+</div>
+</div>
+</header>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+<section class="{{m.cls}}" style="background: var(--desk); border-radius: 24px; padding: 40px; display: flex; flex-direction: column; gap: 32px; color: var(--ink)">
+<div class="lbl" style="font-size: 18px">{{m.label}}</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 24px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">i. idle</span>
+<div class="w"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="var(--ink)"></path></svg><span class="t" style="flex: 1">Haku</span><span class="sc">⌥ SPACE</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">ii. listening</span>
+<div class="w"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="var(--ink)"></path><rect x="11" y="23" width="24" height="7" fill="var(--hl)"></rect></svg><span class="t"><span class="hl">listening</span></span><svg width="84" height="24" viewBox="0 0 84 24" aria-hidden="true" style="flex: 1"><path class="write" d="M2 12 C6 4, 9 20, 13 12 S20 2, 25 12 S32 22, 37 12 S44 5, 49 12 S56 19, 61 12 S68 8, 73 12 S79 15, 82 12" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path></svg></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">iii. thinking</span>
+<div class="w"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="var(--ink)"></path></svg><span class="t" style="flex: 1">thinking</span><span class="dots"><i></i><i></i><i></i></span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">iv. speaking</span>
+<div class="w"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="var(--ink)"></path></svg><span style="position: relative; flex: 1"><span class="t">speaking</span><svg width="70" height="6" viewBox="0 0 70 6" aria-hidden="true" style="position: absolute; left: 0; bottom: -7px"><path class="under" d="M1 4 Q18 1 35 3 T69 2" fill="none" stroke="var(--ink)" stroke-width="1.4" stroke-linecap="round"></path></svg></span><button class="lnk" style="font-size: 13px">stop</button></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">v. agent running</span>
+<div class="w"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="var(--ink)"></path></svg><span class="t" style="flex: 1">Claude Code</span><svg width="44" height="16" viewBox="0 0 44 16" aria-hidden="true"><path d="M3 2v12M9 2v12" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round"></path><path d="M15 2v12M21 2v12M27 2v12" stroke="var(--rule)" stroke-width="1.6" stroke-linecap="round"></path></svg><span class="sc">2/5</span><span class="stamp">2</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">vi. error</span>
+<div class="w"><svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="none" stroke="var(--err)" stroke-width="4"></path></svg><span class="t" style="flex: 1; text-decoration: underline wavy var(--err); text-decoration-thickness: 1.5px; text-underline-offset: 5px">mic unavailable</span><button class="lnk" style="font-size: 13px">fix</button></div>
+</div>
+</div>
+
+<div style="display: flex; justify-content: center; padding-top: 8px">
+<div style="width: 460px; height: 640px; display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden">
+
+<div style="flex: none; height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 10px 0 16px; border-bottom: 1px solid var(--rule)">
+<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 13h11l3-4h18a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2z" fill="var(--ink)"></path></svg>
+<span class="t" style="font-size: 18px">Haku</span>
+<span class="sc" style="flex: 1">SAT 10 OCT · GEMMA 4 LOCAL</span>
+<button class="ib" aria-label="Tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"></path></svg></button>
+<button class="ib" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg></button>
+<button class="ib" aria-label="Collapse to widget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+</div>
+
+<div style="flex: 1; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr) 128px">
+<div style="padding: 18px 18px 18px 20px; display: flex; flex-direction: column; gap: 18px; font-family: var(--serif); font-size: 16px; line-height: 1.45">
+<div style="font-style: italic; color: var(--mut)">— Run the devenv tests and tell me what's failing.</div>
+<div>Handed to Claude Code in <span style="font-family: var(--mono); font-size: 13px">~/code/devenv</span>. I'll note it in the margin when it's done.</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="align-self: flex-start; position: relative; padding: 6px; background: var(--paper2); border: 1px solid var(--rule); transform: rotate(-1.5deg)">
+<span style="position: absolute; top: -7px; left: 50%; width: 44px; height: 12px; margin-left: -22px; background: var(--hl); opacity: .55"></span>
+<div style="width: 132px; height: 70px; background: repeating-linear-gradient(0deg, var(--rule) 0 1px, transparent 1px 9px)"></div>
+<div style="font-family: var(--mono); font-size: 10px; color: var(--mut); padding-top: 4px">caddy-error.png</div>
+</div>
+<div style="font-style: italic; color: var(--mut)">— What's this one about?</div>
+</div>
+<div>Caddy can't get a cert for staging — the <span class="hl">A record</span> still points at the old IP.</div>
+</div>
+<aside style="border-left: 1.5px solid var(--margin); padding: 18px 12px; display: flex; flex-direction: column; gap: 18px">
+<div style="padding-top: 44px; display: flex; flex-direction: column; gap: 4px; font-family: var(--serif); font-style: italic; font-size: 13px; line-height: 1.35; color: var(--blue)">
+<span style="font-weight: 500">Claude Code</span>
+<span>running · step 2 of 5</span>
+<span>41 passed, 3 failed</span>
+<span style="display: flex; gap: 10px; padding-top: 4px"><button class="lnk" style="font-size: 13px">log</button><button class="lnk" style="font-size: 13px">cancel</button></span>
+</div>
+</aside>
+</div>
+
+<div style="flex: none; padding: 10px 16px; border-top: 1px solid var(--rule); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap">
+<span class="lbl">Workflows:</span>
+<button class="lnk">standup</button>
+<button class="lnk">deploy staging</button>
+<button class="lnk">tidy downloads</button>
+</div>
+
+<div style="flex: none; padding: 12px 12px 14px 16px; display: flex; align-items: center; gap: 8px; background: var(--paper2); border-top: 1px solid var(--rule)">
+<button class="ib" aria-label="Attach file or image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5l-8 8a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7L9.7 17a1.7 1.7 0 0 1-2.4-2.4L15 7"></path></svg></button>
+<label class="sr" for="b-in-{{m.cls}}">Message Haku</label>
+<input id="b-in-{{m.cls}}" placeholder="Write, or hold ⌥ Space to speak" style="flex: 1; min-width: 0; height: 36px; box-sizing: border-box; padding: 0 2px; border: 0; border-bottom: 1px solid var(--ink); background: transparent; color: var(--ink); font: italic 16px var(--serif); outline: none">
+<button aria-label="Hold to talk" style="width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--ink); color: var(--paper); display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+</div>
+
+</div>
+</div>
+</section>
+</sc-for>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"highlight":{"editor":"color","default":"#F4D24C","options":["#F4D24C","#9FE0B4","#F7A9BE","#9CC8F2"]},"motion":{"editor":"boolean","default":true},"$preview":{"width":1600,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      highlight: this.props.highlight ?? '#F4D24C',
+      motionCls: (this.props.motion ?? true) ? 'motion' : '',
+      modes: [{ cls: 'light', label: 'Light — daylight paper' }, { cls: 'dark', label: 'Dark — carbon paper' }]
+    };
+  }
+}
+</script>
+</body>
+</html>

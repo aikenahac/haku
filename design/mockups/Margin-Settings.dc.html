@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Haku · Settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&amp;family=Atkinson+Hyperlegible:wght@400;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#24467A}a:hover{color:#1C1E24}
+.hb{--serif:'Newsreader','New York',Georgia,serif;--sans:'Atkinson Hyperlegible',-apple-system,system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;font-family:var(--sans);color:#1C1E24}
+.hb .light{--desk:#E6E1D4;--paper:#FCFAF4;--paper2:#F3EFE4;--ink:#1C1E24;--mut:#5A5C63;--rule:#DAD3C3;--blue:#24467A;--err:#B3261E;--shadow:0 1px 0 rgba(60,45,20,.06),0 8px 18px -10px rgba(60,45,20,.4)}
+.hb .dark{--desk:#111215;--paper:#1D1E22;--paper2:#26272C;--ink:#ECE8DD;--mut:#A8A498;--rule:#36373D;--blue:#A3BCE6;--err:#FF8F7F;--shadow:0 1px 0 rgba(255,255,255,.03) inset,0 12px 24px -12px rgba(0,0,0,.85)}
+.hb .t{font-family:var(--serif);font-style:italic;line-height:1.1}
+.hb .lbl{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--mut)}
+.hb .h{font-family:var(--serif);font-style:italic;font-size:18px;padding-bottom:6px;border-bottom:1px solid var(--rule);margin:0}
+.hb .lnk{font-family:var(--serif);font-size:13px;color:var(--blue);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;background:none;border:0;padding:0;cursor:pointer}
+.hb .nav{display:block;width:100%;text-align:left;border:0;background:transparent;color:var(--mut);font-family:var(--serif);font-size:15px;padding:7px 10px;border-radius:3px;cursor:pointer}
+.hb .nav.on{color:var(--ink);background:var(--paper2)}
+.hb .f{display:grid;grid-template-columns:104px minmax(0,1fr);gap:10px 14px;align-items:center;font-size:13px}
+.hb .in{height:30px;box-sizing:border-box;border:1px solid var(--rule);background:var(--paper2);color:var(--ink);padding:0 10px;font:12.5px var(--mono);border-radius:3px;outline:none;min-width:0}
+.hb .sel{height:30px;box-sizing:border-box;border:1px solid var(--rule);background:var(--paper2);color:var(--ink);padding:0 8px;font:13px var(--sans);border-radius:3px}
+.hb .seg{display:flex;border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.hb .seg button{flex:1;height:30px;border:0;border-right:1px solid var(--rule);background:transparent;color:var(--mut);font:13px var(--sans);cursor:pointer;padding:0 8px;white-space:nowrap}
+.hb .seg button:last-child{border-right:0}
+.hb .seg button.on{background:var(--paper2);color:var(--ink);font-weight:700}
+.hb .sw{appearance:none;-webkit-appearance:none;width:32px;height:18px;border-radius:9px;background:var(--rule);position:relative;margin:0;cursor:pointer;flex:none}
+.hb .sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--paper);transition:left .15s}
+.hb .sw:checked{background:var(--ink)}
+.hb .sw:checked::after{left:16px}
+.hb .kc{font:500 11.5px var(--mono);border:1px solid var(--rule);border-bottom-width:2px;border-radius:3px;padding:2px 6px;background:var(--paper2);color:var(--ink)}
+.hb .ag{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule)}
+.hb .ok{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--blue)}
+.hb .th{display:flex;flex-direction:column;gap:6px;border:1px solid var(--rule);border-radius:3px;padding:6px;background:transparent;color:var(--ink);cursor:pointer;text-align:left}
+.hb .th.on{outline:2px solid var(--ink);outline-offset:1px}
+.hb .th .pv{height:40px;border-radius:2px;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:0 8px}
+.hb .th .pv i{display:block;height:3px;border-radius:1px}
+.hb .th span{font-family:var(--serif);font-size:13px}
+.hb .dot{width:22px;height:22px;border-radius:50%;border:0;cursor:pointer;padding:0}
+.hb .dot.on{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--ink)}
+.hb input[type=range]{accent-color:var(--ink);width:100%;margin:0}
+</style>
+</helmet>
+<div class="hb" style="width: 1600px; min-height: 1640px; box-sizing: border-box; padding: 64px; background: #EFEBE1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+<sc-for list="{{panes}}" as="p" hint-placeholder-count="4">
+<section class="{{p.cls}}" style="background: var(--desk); border-radius: 24px; padding: 32px 40px 40px; display: flex; flex-direction: column; gap: 20px; color: var(--ink)">
+<div class="lbl" style="font-size: 18px">{{p.label}}</div>
+<div style="height: 640px; display: grid; grid-template-columns: 160px minmax(0, 1fr); background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden">
+<nav style="border-right: 1px solid var(--rule); padding: 18px 10px; display: flex; flex-direction: column; gap: 2px; background: var(--paper)">
+<span class="t" style="font-size: 20px; padding: 0 10px 14px">Settings</span>
+<sc-for list="{{p.nav}}" as="n" hint-placeholder-count="5"><button class="nav {{n.on}}">{{n.name}}</button></sc-for>
+</nav>
+<div style="min-width: 0; padding: 22px 26px; display: flex; flex-direction: column; gap: 18px; overflow: hidden">
+
+<sc-if value="{{p.isModels}}" hint-placeholder-val="{{ true }}">
+<h2 class="h">Local model</h2>
+<div class="f">
+<span class="lbl">Server</span>
+<div class="seg" role="group" aria-label="Server type"><button class="on">LM Studio</button><button>Ollama</button><button>OpenAI-style</button></div>
+<label class="lbl" for="ep-{{p.id}}">Endpoint</label>
+<div style="display: flex; align-items: center; gap: 10px"><input class="in" id="ep-{{p.id}}" value="http://localhost:1234/v1" style="flex: 1"><span class="ok">connected</span></div>
+<label class="lbl" for="md-{{p.id}}">Model</label>
+<select class="sel" id="md-{{p.id}}"><option>gemma-4-e4b</option></select>
+<label class="lbl" for="fb-{{p.id}}">If it's down</label>
+<select class="sel" id="fb-{{p.id}}"><option>Tell me, don't fall back</option></select>
+</div>
+<h2 class="h" style="margin-top: 6px">Agents</h2>
+<div style="display: flex; flex-direction: column">
+<div class="ag">
+<span style="font-family: var(--serif); font-size: 16px">Claude Code</span><input class="sw" type="checkbox" role="switch" aria-label="Enable Claude Code" checked>
+<span style="font-family: var(--mono); font-size: 11.5px; color: var(--mut)">~/.local/bin/claude · edits: ask first</span><button class="lnk">edit</button>
+</div>
+<div class="ag">
+<span style="font-family: var(--serif); font-size: 16px">Codex</span><input class="sw" type="checkbox" role="switch" aria-label="Enable Codex" checked>
+<span style="font-family: var(--mono); font-size: 11.5px; color: var(--mut)">/opt/homebrew/bin/codex · edits: read only</span><button class="lnk">edit</button>
+</div>
+</div>
+<div class="f">
+<label class="lbl" for="df-{{p.id}}">Default folder</label>
+<input class="in" id="df-{{p.id}}" value="~/code">
+<span class="lbl">Run at most</span>
+<div class="seg" role="group" aria-label="Concurrent agent jobs" style="max-width: 200px"><button>1</button><button class="on">2</button><button>4</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{p.isKeys}}" hint-placeholder-val="{{ false }}">
+<h2 class="h">Hotkeys</h2>
+<div class="f">
+<span class="lbl">Hold to talk</span><span style="display: flex; align-items: center; gap: 6px"><span class="kc">⌥</span><span class="kc">Space</span><button class="lnk" style="margin-left: auto">change</button></span>
+<span class="lbl">Open panel</span><span style="display: flex; align-items: center; gap: 6px"><span class="kc">⌥</span><span class="kc">⇧</span><span class="kc">Space</span><button class="lnk" style="margin-left: auto">change</button></span>
+<span class="lbl">Tasks</span><span style="display: flex; align-items: center; gap: 6px"><span class="kc">⌥</span><span class="kc">⇧</span><span class="kc">T</span><button class="lnk" style="margin-left: auto">change</button></span>
+<span class="lbl">Stop / deny</span><span style="display: flex; align-items: center; gap: 6px"><span class="kc">esc</span></span>
+<span class="lbl">Approve</span><span style="display: flex; align-items: center; gap: 6px"><span class="kc">⏎</span><span class="lbl" style="font-size: 12.5px; margin-left: 6px">only while a prompt is open</span></span>
+</div>
+<h2 class="h" style="margin-top: 6px">Voice</h2>
+<div class="f">
+<span class="lbl">Speech to text</span>
+<div class="seg" role="group" aria-label="Speech recognition"><button class="on">macOS, on device</button><button>Whisper, local</button></div>
+<span class="lbl">Languages</span>
+<span style="display: flex; gap: 6px; align-items: center"><span class="kc" style="font-family: var(--sans)">English</span><span class="kc" style="font-family: var(--sans)">Slovenščina</span><button class="lnk">+ add</button></span>
+<span class="lbl">Speak replies</span>
+<div class="seg" role="group" aria-label="Speak replies"><button>Always</button><button class="on">When I spoke</button><button>Never</button></div>
+<label class="lbl" for="vo-{{p.id}}">Voice</label>
+<span style="display: flex; gap: 10px; align-items: center"><select class="sel" id="vo-{{p.id}}" style="flex: 1"><option>[system voice]</option></select><button class="lnk">preview</button></span>
+<label class="lbl" for="rt-{{p.id}}">Rate</label>
+<input id="rt-{{p.id}}" type="range" min="0" max="100" value="55">
+<span class="lbl">Confirm by voice</span>
+<span style="display: flex; align-items: center; gap: 10px"><input class="sw" type="checkbox" role="switch" aria-label="Confirm prompts by voice" checked><span style="color: var(--mut)">“yes”, “no”, “send it”</span></span>
+</div>
+</sc-if>
+
+<sc-if value="{{p.isLook}}" hint-placeholder-val="{{ false }}">
+<h2 class="h">Theme</h2>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{themes}}" as="th" hint-placeholder-count="6">
+<button class="th {{th.on}}"><span class="pv" style="background: {{th.bg}}; border: 1px solid {{th.edge}}"><i style="width: 70%; background: {{th.ink}}"></i><i style="width: 44%; background: {{th.hl}}; height: 6px"></i></span><span>{{th.name}}</span></button>
+</sc-for>
+</div>
+<div class="f">
+<span class="lbl">Mode</span>
+<div class="seg" role="group" aria-label="Light or dark"><button>Light</button><button>Dark</button><button class="on">Match system</button></div>
+<span class="lbl">Highlighter</span>
+<span style="display: flex; gap: 10px"><button class="dot on" aria-label="Yellow" style="background: #F4D24C"></button><button class="dot" aria-label="Mint" style="background: #9FE0B4"></button><button class="dot" aria-label="Pink" style="background: #F7A9BE"></button><button class="dot" aria-label="Blue" style="background: #9CC8F2"></button></span>
+<span class="lbl">Widget shape</span>
+<div class="seg" role="group" aria-label="Widget shape"><button class="on">Slip</button><button>Index tab</button><button>Seal</button></div>
+<span class="lbl">Widget size</span>
+<div class="seg" role="group" aria-label="Widget size" style="max-width: 200px"><button>S</button><button class="on">M</button><button>L</button></div>
+<label class="lbl" for="op-{{p.id}}">Idle opacity</label>
+<span style="display: flex; align-items: center; gap: 10px"><input id="op-{{p.id}}" type="range" min="20" max="100" value="60"><span style="font-family: var(--mono); font-size: 12px; width: 34px">60%</span></span>
+<span class="lbl">Idle animation</span>
+<span style="display: flex; align-items: center; gap: 10px"><input class="sw" type="checkbox" role="switch" aria-label="Idle animation"><span style="color: var(--mut)">Off · always off with Reduce Motion</span></span>
+<span class="lbl">Density</span>
+<div class="seg" role="group" aria-label="Density" style="max-width: 260px"><button class="on">Compact</button><button>Comfortable</button></div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</section>
+</sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1600,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const names = ['General', 'Models & agents', 'Hotkeys & voice', 'Appearance', 'About'];
+    const nav = (active) => names.map((n) => ({ name: n, on: n === active ? 'on' : '' }));
+    const themes = [
+      { name: 'Daylight', bg: '#FCFAF4', ink: '#1C1E24', hl: '#F4D24C', edge: '#DAD3C3' },
+      { name: 'Carbon', bg: '#1D1E22', ink: '#ECE8DD', hl: '#E2C13B', edge: '#36373D', on: 'on' },
+      { name: 'Blueprint', bg: '#1B4A78', ink: '#EAF2FA', hl: '#F2E7C4', edge: '#2C6196' },
+      { name: 'Legal pad', bg: '#FBF0B2', ink: '#1E2A44', hl: '#F29BB4', edge: '#E3D48A' },
+      { name: 'Typewriter', bg: '#F3F0E8', ink: '#16161A', hl: '#B3261E', edge: '#D8D3C6' },
+      { name: 'Kraft', bg: '#C2A47B', ink: '#271D13', hl: '#F7F1E3', edge: '#A88C64' }
+    ].map((t) => Object.assign({ on: '' }, t));
+    return {
+      themes: themes,
+      panes: [
+        { id: 'a', cls: 'light', label: 'Light — models & agents', nav: nav('Models & agents'), isModels: true, isKeys: false, isLook: false },
+        { id: 'b', cls: 'light', label: 'Light — hotkeys & voice', nav: nav('Hotkeys & voice'), isModels: false, isKeys: true, isLook: false },
+        { id: 'c', cls: 'dark', label: 'Dark — appearance & customization', nav: nav('Appearance'), isModels: false, isKeys: false, isLook: true },
+        { id: 'd', cls: 'dark', label: 'Dark — models & agents', nav: nav('Models & agents'), isModels: true, isKeys: false, isLook: false }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Haku · A · Signal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#55585D}a:hover{color:#141517}
+.ha{--sans:'Instrument Sans',-apple-system,'SF Pro Text',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;font-family:var(--sans);color:#141517}
+.ha .light{--desk:#E3E3DF;--surf:#F8F8F5;--surf2:#EFEFEB;--fg:#141517;--mut:#55585D;--line:#CDCEC9;--off:#B3B5B0;--err:#B42318;--shadow:0 1px 0 rgba(0,0,0,.04),0 10px 28px -14px rgba(20,21,23,.35)}
+.ha .dark{--desk:#0B0C0D;--surf:#18191B;--surf2:#212225;--fg:#EDEDE8;--mut:#A0A3A8;--line:#303236;--off:#4A4D51;--err:#FF7564;--shadow:0 1px 0 rgba(255,255,255,.04) inset,0 14px 32px -12px rgba(0,0,0,.8)}
+.ha .w{position:relative;width:248px;height:44px;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--surf);box-shadow:var(--shadow);color:var(--fg)}
+.ha .lamp{width:8px;height:8px;border-radius:50%;background:var(--off);flex:none}
+.ha .lamp.on{background:var(--acc)}
+.ha .lamp.fg{background:var(--fg)}
+.ha .lamp.err{background:var(--err)}
+.ha .ro{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;min-width:52px}
+.ha .meter{flex:1;height:22px;display:flex;align-items:center;gap:2px}
+.ha .meter i{display:block;width:3px;border-radius:1px;background:var(--line)}
+.ha .meter.hot i{background:var(--acc)}
+.ha .meter.ink i{background:var(--fg)}
+.ha .meter.scan i.lit{background:var(--fg)}
+.ha .key{font-family:var(--mono);font-size:10px;color:var(--mut);border:1px solid var(--line);border-radius:4px;padding:2px 5px;flex:none}
+.ha .cells{flex:1;display:flex;gap:3px}
+.ha .cell{height:6px;flex:1;border-radius:1px;background:var(--line)}
+.ha .cell.done{background:var(--fg)}
+.ha .cell.live{background:var(--acc)}
+.ha .badge{position:absolute;top:-7px;right:-7px;min-width:18px;height:18px;border-radius:9px;background:var(--acc);color:#141517;font:600 10px/18px var(--mono);text-align:center;box-shadow:0 0 0 2px var(--desk)}
+.ha .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.ha .ib{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--mut);border-radius:6px;padding:0;position:relative;cursor:pointer}
+.ha .ib:hover{background:var(--surf2);color:var(--fg)}
+.ha .ib svg{width:16px;height:16px}
+.ha .chip{font:500 12px/1 var(--sans);color:var(--fg);background:var(--surf2);border:1px solid var(--line);border-radius:6px;padding:7px 9px;cursor:pointer}
+.ha .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (prefers-reduced-motion: no-preference){
+.ha.motion .meter.hot i,.ha.motion .meter.ink i{animation:bob .8s ease-in-out infinite alternate}
+.ha.motion .meter.scan i{animation:scan 1.4s linear infinite}
+.ha.motion .lamp.pulse,.ha.motion .cell.live{animation:pulse 1.4s ease-in-out infinite}
+}
+@keyframes bob{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+@keyframes scan{0%,70%,100%{background:var(--line)}10%{background:var(--fg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+</style>
+</helmet>
+<div class="ha {{motionCls}}" style="--acc: {{accent}}; width: 1600px; min-height: 1640px; box-sizing: border-box; padding: 64px; background: #F2F2EF; display: flex; flex-direction: column; gap: 48px">
+
+<header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px">
+<div style="display: flex; align-items: center; gap: 24px">
+<svg width="88" height="88" viewBox="0 0 48 48" role="img" aria-label="Haku mark"><rect width="48" height="48" rx="11" fill="#141517"></rect><rect x="13" y="11" width="5" height="26" rx="2.5" fill="#F8F8F5"></rect><rect x="30" y="11" width="5" height="26" rx="2.5" fill="#F8F8F5"></rect><circle cx="24" cy="24" r="3.6" fill="{{accent}}"></circle></svg>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 80px; line-height: .9; font-weight: 600; letter-spacing: -0.04em">haku</div>
+<div style="font-family: var(--mono); font-size: 12px; letter-spacing: .12em; color: #55585D">A — SIGNAL · INSTRUMENT PANEL</div>
+</div>
+</div>
+<div style="display: flex; align-items: flex-end; gap: 20px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+<svg width="64" height="64" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#F8F8F5" stroke="#CDCEC9"></rect><rect x="13" y="11" width="5" height="26" rx="2.5" fill="#141517"></rect><rect x="30" y="11" width="5" height="26" rx="2.5" fill="#141517"></rect><circle cx="24" cy="24" r="3.6" fill="{{accent}}"></circle></svg>
+<span style="font-family: var(--mono); font-size: 10px; color: #55585D">APP · LIGHT</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+<svg width="64" height="64" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="11" fill="#18191B"></rect><rect x="13" y="11" width="5" height="26" rx="2.5" fill="#EDEDE8"></rect><rect x="30" y="11" width="5" height="26" rx="2.5" fill="#EDEDE8"></rect><circle cx="24" cy="24" r="3.6" fill="{{accent}}"></circle></svg>
+<span style="font-family: var(--mono); font-size: 10px; color: #55585D">APP · DARK</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px">
+<div style="height: 64px; display: flex; align-items: center; gap: 14px; padding: 0 14px; background: #E3E3DF; border-radius: 8px">
+<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="8" width="7" height="32" rx="3.5" fill="#141517"></rect><rect x="31" y="8" width="7" height="32" rx="3.5" fill="#141517"></rect><circle cx="24" cy="24" r="5" fill="#141517"></circle></svg>
+<svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><rect x="10" y="8" width="7" height="32" rx="3.5" fill="#141517"></rect><rect x="31" y="8" width="7" height="32" rx="3.5" fill="#141517"></rect><circle cx="24" cy="24" r="5" fill="{{accent}}"></circle></svg>
+</div>
+<span style="font-family: var(--mono); font-size: 10px; color: #55585D">MENU BAR · IDLE / LIVE</span>
+</div>
+</div>
+</header>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+<sc-for list="{{modes}}" as="m" hint-placeholder-count="2">
+<section class="{{m.cls}}" style="background: var(--desk); border-radius: 24px; padding: 40px; display: flex; flex-direction: column; gap: 32px; color: var(--fg)">
+<div class="lbl" style="color: var(--mut)">{{m.label}}</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 24px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">01 Idle</span>
+<div class="w"><span class="lamp"></span><span class="ro">HAKU</span><span class="meter"><sc-for list="{{flat}}" as="b" hint-placeholder-count="14"><i style="height: {{b.h}}px"></i></sc-for></span><span class="key">⌥ Space</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">02 Listening</span>
+<div class="w"><span class="lamp on"></span><span class="ro">REC 0:04</span><span class="meter hot"><sc-for list="{{listen}}" as="b" hint-placeholder-count="14"><i style="height: {{b.h}}px; animation-delay: -{{b.d}}ms"></i></sc-for></span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">03 Thinking</span>
+<div class="w"><span class="lamp fg pulse"></span><span class="ro">THINK</span><span class="meter scan"><sc-for list="{{scan}}" as="b" hint-placeholder-count="14"><i class="{{b.c}}" style="height: {{b.h}}px; animation-delay: {{b.d}}ms"></i></sc-for></span><span class="key">esc</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">04 Speaking</span>
+<div class="w"><span class="lamp fg"></span><span class="ro">SAY</span><span class="meter ink"><sc-for list="{{speak}}" as="b" hint-placeholder-count="14"><i style="height: {{b.h}}px; animation-delay: -{{b.d}}ms"></i></sc-for></span><span class="key">esc</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">05 Agent running</span>
+<div class="w"><span class="lamp fg"></span><span class="ro">CC</span><span class="cells"><span class="cell done"></span><span class="cell done"></span><span class="cell live"></span><span class="cell"></span><span class="cell"></span></span><span style="font-family: var(--mono); font-size: 11px; color: var(--mut)">2/5</span><span class="badge">2</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span class="lbl">06 Error</span>
+<div class="w" style="border-color: var(--err)"><span class="lamp err"></span><span class="ro" style="color: var(--err)">ERR</span><span style="flex: 1; font-size: 12px; font-weight: 500">Mic access off</span><button class="chip" style="padding: 5px 8px; font-size: 11px">Fix</button></div>
+</div>
+</div>
+
+<div style="display: flex; justify-content: center; padding-top: 8px">
+<div style="width: 420px; height: 640px; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; background: var(--surf); box-shadow: var(--shadow); overflow: hidden">
+
+<div style="height: 48px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 8px 0 14px; border-bottom: 1px solid var(--line)">
+<span class="lamp fg"></span>
+<span class="ro">HAKU</span>
+<span style="flex: 1; font-family: var(--mono); font-size: 10px; color: var(--mut)">gemma-4-e4b · local</span>
+<button class="ib" aria-label="Tasks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"></path></svg><span class="badge" style="top: -2px; right: -2px; min-width: 14px; height: 14px; line-height: 14px; font-size: 9px; box-shadow: 0 0 0 2px var(--surf)">2</span></button>
+<button class="ib" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg></button>
+<button class="ib" aria-label="Collapse to widget"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+</div>
+
+<div style="flex: 1; overflow: hidden; padding: 16px; display: flex; flex-direction: column; gap: 16px; font-size: 13px; line-height: 1.5">
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span class="lbl" style="font-size: 9px">14:02 · you</span>
+<span>Run the devenv tests and tell me what's failing.</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span class="lbl" style="font-size: 9px">14:02 · haku</span>
+<span>Sent to Claude Code in <span style="font-family: var(--mono); font-size: 12px">~/code/devenv</span>. I'll tell you when it's done.</span>
+</div>
+<div style="border: 1px solid var(--line); border-radius: 8px; background: var(--surf2); padding: 12px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 8px">
+<span class="lamp on pulse"></span>
+<span class="ro" style="min-width: 0">CLAUDE CODE</span>
+<span style="flex: 1"></span>
+<span style="font-family: var(--mono); font-size: 10px; color: var(--mut)">RUNNING · 1m 12s</span>
+</div>
+<div class="cells" style="flex: none"><span class="cell done"></span><span class="cell done"></span><span class="cell live"></span><span class="cell"></span><span class="cell"></span></div>
+<div style="font-family: var(--mono); font-size: 11px; color: var(--mut); line-height: 1.6">› bun test<br>› 41 passed, 3 failed — compose.spec.ts</div>
+<div style="display: flex; gap: 8px"><button class="chip">Open log</button><button class="chip">Cancel</button></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span class="lbl" style="font-size: 9px">14:05 · you</span>
+<div style="display: flex; align-items: center; gap: 8px; align-self: flex-start; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-family: var(--mono); font-size: 11px; color: var(--mut)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><path d="M21 16l-5-5-9 9"></path></svg>caddy-error.png</div>
+<span>What's this one about?</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span class="lbl" style="font-size: 9px">14:05 · haku</span>
+<span>Caddy can't get a cert for staging — the A record still points at the old IP.</span>
+</div>
+</div>
+
+<div style="flex: none; padding: 10px 14px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 6px; flex-wrap: wrap">
+<span class="lbl" style="font-size: 9px; margin-right: 4px">Workflows</span>
+<button class="chip">Standup notes</button>
+<button class="chip">Deploy staging</button>
+<button class="chip">Tidy Downloads</button>
+</div>
+
+<div style="flex: none; padding: 12px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 8px">
+<button class="ib" aria-label="Attach file or image"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11.5l-8 8a5 5 0 0 1-7-7l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7L9.7 17a1.7 1.7 0 0 1-2.4-2.4L15 7"></path></svg></button>
+<label class="sr" for="a-in-{{m.cls}}">Message Haku</label>
+<input id="a-in-{{m.cls}}" placeholder="Type, or hold ⌥ Space" style="flex: 1; min-width: 0; height: 36px; box-sizing: border-box; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surf2); color: var(--fg); font: 13px var(--sans); outline: none">
+<button aria-label="Hold to talk" style="width: 36px; height: 36px; border-radius: 8px; border: 0; background: var(--fg); color: var(--surf); display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+</div>
+
+</div>
+</div>
+</section>
+</sc-for>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F25C1F","options":["#F25C1F","#E8B21D","#2FA36B","#3E7BFA"]},"motion":{"editor":"boolean","default":true},"$preview":{"width":1600,"height":1640}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const mk = (arr, lit) => arr.map((h, i) => ({ h: h, d: i * 90, c: lit && lit.indexOf(i) > -1 ? 'lit' : '' }));
+    return {
+      accent: this.props.accent ?? '#F25C1F',
+      motionCls: (this.props.motion ?? true) ? 'motion' : '',
+      modes: [{ cls: 'light', label: 'Light' }, { cls: 'dark', label: 'Dark' }],
+      flat: mk([2,2,2,2,2,2,2,2,2,2,2,2,2,2]),
+      listen: mk([5,9,15,11,19,13,7,17,21,12,8,14,6,4]),
+      scan: mk([3,3,3,3,3,6,8,6,3,3,3,3,3,3], [5,6,7]),
+      speak: mk([6,10,8,14,12,9,16,11,7,12,9,6,4,3])
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,597 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		03AF7967EED8F6678374EF79 /* Glyphs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24B4C7804EF7EBC7A49F685 /* Glyphs.swift */; };
+		1145C5A9736C46FFFD14821B /* PreviewSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3069F16C7A3EE5856A07E077 /* PreviewSnapshotTests.swift */; };
+		210E75CDA7EB10A9AD96297E /* WidgetState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F7E121D3397F6DF76F032D /* WidgetState.swift */; };
+		3598FD75F0CE6D5F79D5EFDD /* Previews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2FBCD6F7913AFC9CC7DAE85 /* Previews.swift */; };
+		3F1AE6C735CA4E3DC6AF6AD4 /* PaperSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DF89FC455134D53B1D6A665 /* PaperSurface.swift */; };
+		40D832DE13CBD25219F08F0E /* InkText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C5CE3937363D53ACFA0305B /* InkText.swift */; };
+		436C5D09C5339D531CB10C42 /* Themes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A20437EE1E950B76B296BBE /* Themes.swift */; };
+		454E02D47D1CB5D33B0F003E /* ConversationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F023D2CFAB5759A6D093F9AC /* ConversationModels.swift */; };
+		5F63DA6573F97D67E3EBA82E /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 628F82820B0F175E0C907748 /* Theme.swift */; };
+		63F05CD8C2B145E52232C90A /* DesignGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CDD4430F2DFE1564B58B927 /* DesignGallery.swift */; };
+		80A899E016773F7A7FBB9C10 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF899928F5C441719189AAAB /* Spacing.swift */; };
+		9A091B2A740634AE51114BEF /* ExpandedPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B0C4E6F92F08A99DBEE6650 /* ExpandedPanelView.swift */; };
+		9D47873B584DCD869F0CE70E /* Controls.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA447FD02E775CB341916E98 /* Controls.swift */; };
+		A675F7134472864023516EB5 /* ColorTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DACD7D16852F6EC7FA000E /* ColorTokens.swift */; };
+		AA567E7013B8CF83D3F94D37 /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC37C9E6ED91863D5CE1447C /* Motion.swift */; };
+		ADD1898867385E4383AA8DC5 /* HakuApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866234DD85E5C217EDBB5AF0 /* HakuApp.swift */; };
+		B6E2D9425610E6637F3A4E2D /* WidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFD3AED9555B945394173BC7 /* WidgetView.swift */; };
+		CCC6B10DCE6B5662BB3299EB /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0277094145FAA558BB68C578 /* Typography.swift */; };
+		D0051DD31CE11149FE36500C /* ContrastTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6CF0DBE8DF667DA429226 /* ContrastTests.swift */; };
+		D35074C0EB718FE08669441A /* WidgetMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854277B3C645B3C46C4B22C9 /* WidgetMetrics.swift */; };
+		D403AB0543607EBFC127303B /* Shadows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676F8D981F90A5443C631CD8 /* Shadows.swift */; };
+		E7CFE20A5E24BD0F513F1273 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FE85CAE9B660D0494AC0502B /* Colors.xcassets */; };
+		E942D1F27F53A106B1828590 /* InkMarks.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC7EA3C6E844CB1961234FFD /* InkMarks.swift */; };
+		EAD07A4B8717839601F489DB /* SVGPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D9D4D2CD6DB38C84388AB33 /* SVGPath.swift */; };
+		F194AB948A4A73FFC2FE86C8 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E823C9883098DAE413B820 /* ThemeManager.swift */; };
+		F8FDAA72DC0163E6CB6BCF12 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = A2CB8ABFFF2FE966A2D3D133 /* Fonts */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8D984BCABD7927667669575E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC36F91B8E94D88089816EBA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 407C099F6179AD145F91DFCC;
+			remoteInfo = Haku;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0277094145FAA558BB68C578 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
+		0A20437EE1E950B76B296BBE /* Themes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Themes.swift; sourceTree = "<group>"; };
+		24F7E121D3397F6DF76F032D /* WidgetState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetState.swift; sourceTree = "<group>"; };
+		27F58E8D5F39E703EECDF8E9 /* HakuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HakuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2DF89FC455134D53B1D6A665 /* PaperSurface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperSurface.swift; sourceTree = "<group>"; };
+		3069F16C7A3EE5856A07E077 /* PreviewSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewSnapshotTests.swift; sourceTree = "<group>"; };
+		3271E372153BB99A7092E6FF /* Haku.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Haku.entitlements; sourceTree = "<group>"; };
+		3CDD4430F2DFE1564B58B927 /* DesignGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignGallery.swift; sourceTree = "<group>"; };
+		628F82820B0F175E0C907748 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		676F8D981F90A5443C631CD8 /* Shadows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shadows.swift; sourceTree = "<group>"; };
+		717AE8CFE12D03D770CA9580 /* Haku.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Haku.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7D9D4D2CD6DB38C84388AB33 /* SVGPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SVGPath.swift; sourceTree = "<group>"; };
+		854277B3C645B3C46C4B22C9 /* WidgetMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetMetrics.swift; sourceTree = "<group>"; };
+		85E823C9883098DAE413B820 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		866234DD85E5C217EDBB5AF0 /* HakuApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HakuApp.swift; sourceTree = "<group>"; };
+		8B0C4E6F92F08A99DBEE6650 /* ExpandedPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandedPanelView.swift; sourceTree = "<group>"; };
+		9C5CE3937363D53ACFA0305B /* InkText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkText.swift; sourceTree = "<group>"; };
+		A2CB8ABFFF2FE966A2D3D133 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fonts; path = Haku/Resources/Fonts; sourceTree = SOURCE_ROOT; };
+		BF9D25CDB1DD56BCD4A46122 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C8DACD7D16852F6EC7FA000E /* ColorTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTokens.swift; sourceTree = "<group>"; };
+		CA447FD02E775CB341916E98 /* Controls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Controls.swift; sourceTree = "<group>"; };
+		DF899928F5C441719189AAAB /* Spacing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
+		EC7EA3C6E844CB1961234FFD /* InkMarks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkMarks.swift; sourceTree = "<group>"; };
+		F023D2CFAB5759A6D093F9AC /* ConversationModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationModels.swift; sourceTree = "<group>"; };
+		F24B4C7804EF7EBC7A49F685 /* Glyphs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Glyphs.swift; sourceTree = "<group>"; };
+		F2FBCD6F7913AFC9CC7DAE85 /* Previews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Previews.swift; sourceTree = "<group>"; };
+		F8E6CF0DBE8DF667DA429226 /* ContrastTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContrastTests.swift; sourceTree = "<group>"; };
+		FC37C9E6ED91863D5CE1447C /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
+		FE85CAE9B660D0494AC0502B /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
+		FFD3AED9555B945394173BC7 /* WidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		355D5FF1556BAD93F197CA2E /* Tokens */ = {
+			isa = PBXGroup;
+			children = (
+				C8DACD7D16852F6EC7FA000E /* ColorTokens.swift */,
+				FC37C9E6ED91863D5CE1447C /* Motion.swift */,
+				676F8D981F90A5443C631CD8 /* Shadows.swift */,
+				DF899928F5C441719189AAAB /* Spacing.swift */,
+				0277094145FAA558BB68C578 /* Typography.swift */,
+				854277B3C645B3C46C4B22C9 /* WidgetMetrics.swift */,
+			);
+			path = Tokens;
+			sourceTree = "<group>";
+		};
+		379A015F43B34F1832A3F0CE = {
+			isa = PBXGroup;
+			children = (
+				E1F285E57848F17CAD77F902 /* Haku */,
+				819275EFDEBA9795E8C0C134 /* HakuTests */,
+				48EBC27C26D26B81E5A328FD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3C5639A88991D99E896DB2F6 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				866234DD85E5C217EDBB5AF0 /* HakuApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		48EBC27C26D26B81E5A328FD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				717AE8CFE12D03D770CA9580 /* Haku.app */,
+				27F58E8D5F39E703EECDF8E9 /* HakuTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		52E448F0E644827235B2798E /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				6B159C44D61BFA9C876138DD /* Components */,
+				943588230DE4EB316C84A065 /* Modifiers */,
+				79C2D5F738FA8F4EEF611C78 /* Shapes */,
+				79E5EFBEBEB983E6E2B25A07 /* Theme */,
+				355D5FF1556BAD93F197CA2E /* Tokens */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		636C6AC11B557C3A08BEFB78 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				24F7E121D3397F6DF76F032D /* WidgetState.swift */,
+				FFD3AED9555B945394173BC7 /* WidgetView.swift */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		6B159C44D61BFA9C876138DD /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				CA447FD02E775CB341916E98 /* Controls.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		6FEF62E17E24CDA61E926975 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FE85CAE9B660D0494AC0502B /* Colors.xcassets */,
+				A2CB8ABFFF2FE966A2D3D133 /* Fonts */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		79C2D5F738FA8F4EEF611C78 /* Shapes */ = {
+			isa = PBXGroup;
+			children = (
+				F24B4C7804EF7EBC7A49F685 /* Glyphs.swift */,
+				EC7EA3C6E844CB1961234FFD /* InkMarks.swift */,
+				7D9D4D2CD6DB38C84388AB33 /* SVGPath.swift */,
+			);
+			path = Shapes;
+			sourceTree = "<group>";
+		};
+		79E5EFBEBEB983E6E2B25A07 /* Theme */ = {
+			isa = PBXGroup;
+			children = (
+				628F82820B0F175E0C907748 /* Theme.swift */,
+				85E823C9883098DAE413B820 /* ThemeManager.swift */,
+				0A20437EE1E950B76B296BBE /* Themes.swift */,
+			);
+			path = Theme;
+			sourceTree = "<group>";
+		};
+		819275EFDEBA9795E8C0C134 /* HakuTests */ = {
+			isa = PBXGroup;
+			children = (
+				F8E6CF0DBE8DF667DA429226 /* ContrastTests.swift */,
+				3069F16C7A3EE5856A07E077 /* PreviewSnapshotTests.swift */,
+			);
+			path = HakuTests;
+			sourceTree = "<group>";
+		};
+		84CF4D72A417135E5E9C2021 /* Panel */ = {
+			isa = PBXGroup;
+			children = (
+				F023D2CFAB5759A6D093F9AC /* ConversationModels.swift */,
+				8B0C4E6F92F08A99DBEE6650 /* ExpandedPanelView.swift */,
+			);
+			path = Panel;
+			sourceTree = "<group>";
+		};
+		943588230DE4EB316C84A065 /* Modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				9C5CE3937363D53ACFA0305B /* InkText.swift */,
+				2DF89FC455134D53B1D6A665 /* PaperSurface.swift */,
+			);
+			path = Modifiers;
+			sourceTree = "<group>";
+		};
+		D40240CEC036BF306F1E7D76 /* Previews */ = {
+			isa = PBXGroup;
+			children = (
+				3CDD4430F2DFE1564B58B927 /* DesignGallery.swift */,
+				F2FBCD6F7913AFC9CC7DAE85 /* Previews.swift */,
+			);
+			path = Previews;
+			sourceTree = "<group>";
+		};
+		E1F285E57848F17CAD77F902 /* Haku */ = {
+			isa = PBXGroup;
+			children = (
+				3C5639A88991D99E896DB2F6 /* App */,
+				52E448F0E644827235B2798E /* DesignSystem */,
+				84CF4D72A417135E5E9C2021 /* Panel */,
+				D40240CEC036BF306F1E7D76 /* Previews */,
+				6FEF62E17E24CDA61E926975 /* Resources */,
+				636C6AC11B557C3A08BEFB78 /* Widget */,
+				3271E372153BB99A7092E6FF /* Haku.entitlements */,
+				BF9D25CDB1DD56BCD4A46122 /* Info.plist */,
+			);
+			path = Haku;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0D59431E3528C71522852D63 /* HakuTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3AB3AD6A848F6FFF1E158207 /* Build configuration list for PBXNativeTarget "HakuTests" */;
+			buildPhases = (
+				A2E6ED92F5F112C58CD6B29D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CCA4D1DAD75304D9013F3E08 /* PBXTargetDependency */,
+			);
+			name = HakuTests;
+			packageProductDependencies = (
+			);
+			productName = HakuTests;
+			productReference = 27F58E8D5F39E703EECDF8E9 /* HakuTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		407C099F6179AD145F91DFCC /* Haku */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CB534E1551A5C859A749F469 /* Build configuration list for PBXNativeTarget "Haku" */;
+			buildPhases = (
+				5A113CC73ECC55992C0137D5 /* Sources */,
+				615B63DD6229BBB09AF25E07 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Haku;
+			packageProductDependencies = (
+			);
+			productName = Haku;
+			productReference = 717AE8CFE12D03D770CA9580 /* Haku.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DC36F91B8E94D88089816EBA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					407C099F6179AD145F91DFCC = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 4A472499E4425C7B4FAD53D2 /* Build configuration list for PBXProject "Haku" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 379A015F43B34F1832A3F0CE;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 48EBC27C26D26B81E5A328FD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				407C099F6179AD145F91DFCC /* Haku */,
+				0D59431E3528C71522852D63 /* HakuTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		615B63DD6229BBB09AF25E07 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7CFE20A5E24BD0F513F1273 /* Colors.xcassets in Resources */,
+				F8FDAA72DC0163E6CB6BCF12 /* Fonts in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5A113CC73ECC55992C0137D5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A675F7134472864023516EB5 /* ColorTokens.swift in Sources */,
+				9D47873B584DCD869F0CE70E /* Controls.swift in Sources */,
+				454E02D47D1CB5D33B0F003E /* ConversationModels.swift in Sources */,
+				63F05CD8C2B145E52232C90A /* DesignGallery.swift in Sources */,
+				9A091B2A740634AE51114BEF /* ExpandedPanelView.swift in Sources */,
+				03AF7967EED8F6678374EF79 /* Glyphs.swift in Sources */,
+				ADD1898867385E4383AA8DC5 /* HakuApp.swift in Sources */,
+				E942D1F27F53A106B1828590 /* InkMarks.swift in Sources */,
+				40D832DE13CBD25219F08F0E /* InkText.swift in Sources */,
+				AA567E7013B8CF83D3F94D37 /* Motion.swift in Sources */,
+				3F1AE6C735CA4E3DC6AF6AD4 /* PaperSurface.swift in Sources */,
+				3598FD75F0CE6D5F79D5EFDD /* Previews.swift in Sources */,
+				EAD07A4B8717839601F489DB /* SVGPath.swift in Sources */,
+				D403AB0543607EBFC127303B /* Shadows.swift in Sources */,
+				80A899E016773F7A7FBB9C10 /* Spacing.swift in Sources */,
+				5F63DA6573F97D67E3EBA82E /* Theme.swift in Sources */,
+				F194AB948A4A73FFC2FE86C8 /* ThemeManager.swift in Sources */,
+				436C5D09C5339D531CB10C42 /* Themes.swift in Sources */,
+				CCC6B10DCE6B5662BB3299EB /* Typography.swift in Sources */,
+				D35074C0EB718FE08669441A /* WidgetMetrics.swift in Sources */,
+				210E75CDA7EB10A9AD96297E /* WidgetState.swift in Sources */,
+				B6E2D9425610E6637F3A4E2D /* WidgetView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A2E6ED92F5F112C58CD6B29D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D0051DD31CE11149FE36500C /* ContrastTests.swift in Sources */,
+				1145C5A9736C46FFFD14821B /* PreviewSnapshotTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CCA4D1DAD75304D9013F3E08 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 407C099F6179AD145F91DFCC /* Haku */;
+			targetProxy = 8D984BCABD7927667669575E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		3E34CB54C73E4F8C54306003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.haku.HakuTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Haku.app/Contents/MacOS/Haku";
+			};
+			name = Release;
+		};
+		6E6F68BC894D295CA5100777 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.haku.HakuTests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Haku.app/Contents/MacOS/Haku";
+			};
+			name = Debug;
+		};
+		B1EAC14873DA6BA608018269 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Haku/Haku.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Haku/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.haku.Haku;
+				PRODUCT_NAME = Haku;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		C809908D60BE2BBB3205D674 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		CB652CF4E53BE7333072EA45 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Haku/Haku.entitlements;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = Haku/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = dev.haku.Haku;
+				PRODUCT_NAME = Haku;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		EC900796E6397C7DEEBE8A12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3AB3AD6A848F6FFF1E158207 /* Build configuration list for PBXNativeTarget "HakuTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6E6F68BC894D295CA5100777 /* Debug */,
+				3E34CB54C73E4F8C54306003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4A472499E4425C7B4FAD53D2 /* Build configuration list for PBXProject "Haku" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C809908D60BE2BBB3205D674 /* Debug */,
+				EC900796E6397C7DEEBE8A12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		CB534E1551A5C859A749F469 /* Build configuration list for PBXNativeTarget "Haku" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB652CF4E53BE7333072EA45 /* Debug */,
+				B1EAC14873DA6BA608018269 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DC36F91B8E94D88089816EBA /* Project object */;
+}
