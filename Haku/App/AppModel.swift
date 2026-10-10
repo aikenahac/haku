@@ -1,0 +1,490 @@
+import AppKit
+import Foundation
+import Observation
+
+/// The app's brain stem: conversation, voice turn-taking, workflows, jobs, and the widget state they add up to.
+@MainActor
+@Observable
+final class AppModel: BrainHost {
+    enum Fix: Equatable { case micSettings, speechSettings, modelSettings, retry, openSettings }
+
+    // Services
+    @ObservationIgnored let settings: AppSettings
+    @ObservationIgnored let themes: ThemeManager
+    @ObservationIgnored let voice: VoicePipeline
+    @ObservationIgnored let brain: Brain
+    @ObservationIgnored let history = HistoryStore()
+    @ObservationIgnored let attachmentsStore = AttachmentStore()
+    let workflows = WorkflowStore()
+    let tasks = TaskStore()
+    let confirmations = ConfirmationCenter()
+    @ObservationIgnored let runner: AgentRunner
+
+    // Conversation
+    private(set) var messages: [ChatMessage] = []
+    var draft = ""
+    private(set) var pendingAttachments: [Attachment] = []
+    private(set) var thinking = false
+    private(set) var thinkingLabel: String?
+    private(set) var error: (reason: String, fix: Fix)?
+    private(set) var modelOnline: Bool?
+    private(set) var hovering = false
+    @ObservationIgnored private var turnTask: Task<Void, Never>?
+    @ObservationIgnored private var lastFailedInput: (String, Bool)?
+    @ObservationIgnored private var confirmListenTask: Task<Void, Never>?
+    @ObservationIgnored private var errorClearTask: Task<Void, Never>?
+    @ObservationIgnored private var talkPressedAt: Date?
+
+    // Window hooks (set by the AppDelegate).
+    @ObservationIgnored var showPanel: () -> Void = {}
+    @ObservationIgnored var togglePanel: () -> Void = {}
+    @ObservationIgnored var showTasks: (UUID?) -> Void = { _ in }
+    @ObservationIgnored var showSettings: (String?) -> Void = { _ in }
+
+    init(settings: AppSettings, themes: ThemeManager) {
+        self.settings = settings
+        self.themes = themes
+        voice = VoicePipeline(settings: settings)
+        brain = Brain(settings: settings)
+        runner = AgentRunner(store: tasks, settings: settings)
+        brain.host = self
+        runner.onFinish = { [weak self] job in self?.jobFinished(job) }
+        if settings.keepHistory {
+            messages = history.messages()
+            brain.seed(messages)
+        }
+        attachmentsStore.purgeAll()
+    }
+
+    // MARK: Widget state
+
+    var widgetState: WidgetState {
+        if let error { return .error(reason: error.reason) }
+        if voice.isListening {
+            return .listening(level: voice.level, elapsed: voice.listeningSince.map { Date.now.timeIntervalSince($0) } ?? 0)
+        }
+        if voice.phase == .speaking { return .speaking }
+        if thinking || voice.phase == .transcribing { return .thinking }
+        let running = tasks.running
+        if let first = running.first {
+            let p = first.stepProgress
+            return .agentRunning(agent: first.runner.displayName, done: p.done, total: max(p.total, p.done), jobs: running.count)
+        }
+        return .idle
+    }
+
+    /// Opacity snaps to 100% on hover, while talking, or when something needs attention.
+    var widgetFullyOpaque: Bool {
+        hovering || widgetState.needsAttention || confirmations.current != nil
+            || tasks.jobs.contains { $0.status == .awaitingApproval }
+    }
+
+    func setHovering(_ h: Bool) { hovering = h }
+
+    var marginNotes: [UUID: MarginNote] {
+        var out: [UUID: MarginNote] = [:]
+        for j in tasks.jobs {
+            guard let mid = j.messageID else { continue }
+            out[jobNoteKey(mid)] = MarginNote(id: j.id, agent: j.runner.displayName, status: j.statusLine,
+                                              detail: j.marginDetail, running: j.isActive || j.status == .awaitingApproval)
+        }
+        return out
+    }
+
+    /// Margin notes are keyed by the message's jobID (= message id of the reply).
+    private func jobNoteKey(_ messageID: UUID) -> UUID { messageID }
+
+    // MARK: Voice turn-taking
+
+    func talkPressed() {
+        talkPressedAt = .now
+        clearError()
+        voice.stopSpeaking()
+        if confirmations.current != nil {
+            confirmListenTask?.cancel()
+            voice.cancelListening()
+        }
+        Task {
+            do { try await voice.beginListening() } catch { handleVoiceError(error) }
+        }
+    }
+
+    func talkReleased() {
+        guard voice.isListening else { return }
+        let pressed = talkPressedAt
+        Task {
+            // Very short taps shouldn't send half a word; give the recognizer a moment.
+            if let pressed, Date.now.timeIntervalSince(pressed) < 0.35 { try? await Task.sleep(for: .milliseconds(250)) }
+            let text = await voice.endListening()
+            guard !text.isEmpty else { return }
+            if confirmations.current != nil {
+                if !confirmations.handleSpoken(text) { /* not a yes/no; keep the slip up */ }
+                return
+            }
+            send(text, spoken: true)
+        }
+    }
+
+    func stopSpeaking() { voice.stopSpeaking() }
+
+    private func handleVoiceError(_ error: Error) {
+        if let v = error as? VoiceError {
+            switch v {
+            case .micDenied, .micUnavailable: setError(v.widgetReason, fix: .micSettings)
+            case .speechDenied: setError(v.widgetReason, fix: .speechSettings)
+            default: setError(v.widgetReason, fix: .openSettings)
+            }
+        } else {
+            setError("mic unavailable", fix: .micSettings)
+        }
+    }
+
+    // MARK: Sending
+
+    func submitDraft() {
+        let text = draft.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty || !pendingAttachments.isEmpty else { return }
+        draft = ""
+        send(text.isEmpty ? "What's this?" : text, spoken: false)
+    }
+
+    func send(_ text: String, spoken: Bool) {
+        clearError()
+        let attachments = pendingAttachments
+        pendingAttachments = []
+        let user = ChatMessage(role: .user, spans: [.text(text)], attachments: attachments)
+        append(user)
+        lastFailedInput = (text, spoken)
+
+        turnTask?.cancel()
+        turnTask = Task {
+            thinking = true
+            defer { thinking = false; thinkingLabel = nil }
+            let replyID = UUID()
+            var reply = ChatMessage(id: replyID, role: .haku, spans: [], jobID: replyID)
+            var replyShown = false
+            let show: (String) -> Void = { [weak self] text in
+                guard let self else { return }
+                reply.spans = MessageSpan.parse(text)
+                if !replyShown { replyShown = true; self.messages.append(reply) } else { self.replaceMessage(reply) }
+            }
+
+            // Exact workflow trigger wins before the model.
+            if let (flow, after) = workflows.match(text) {
+                let result = await executeWorkflow(flow, after: after, messageID: replyID, attachments: attachments)
+                show(result)
+                finishTurn(reply, spoken: spoken, attachments: attachments)
+                return
+            }
+
+            do {
+                let r = try await brain.respond(to: text, attachments: attachments, messageID: replyID,
+                                                onDelta: { s in show(s) }, onStatus: { [weak self] s in self?.thinkingLabel = s })
+                show(r.text)
+                lastFailedInput = nil
+                if r.startedJob == nil { attachmentsStore.discard(attachments) }
+                finishTurn(reply, spoken: spoken, attachments: [])
+            } catch is CancellationError {
+            } catch let e as LLMError {
+                modelOnline = false
+                setError(e.widgetReason, fix: .modelSettings)
+                show(e.localizedDescription.prefix(1).uppercased() + e.localizedDescription.dropFirst() + ". Check Settings › Models & agents.")
+                attachmentsStore.discard(attachments)
+            } catch {
+                setError("something broke", fix: .retry)
+                attachmentsStore.discard(attachments)
+            }
+        }
+    }
+
+    private func finishTurn(_ reply: ChatMessage, spoken: Bool, attachments: [Attachment]) {
+        guard let final = messages.first(where: { $0.id == reply.id }) else { return }
+        if settings.keepHistory { history.append(final) }
+        let speak = settings.speakReplies == .always || (settings.speakReplies == .whenISpoke && spoken)
+        if speak {
+            Task { await voice.speak(final.plainText, allowVoiceBargeIn: spoken) }
+        }
+    }
+
+    func retryLast() {
+        guard let (text, spoken) = lastFailedInput else { return }
+        send(text, spoken: spoken)
+    }
+
+    private func append(_ m: ChatMessage) {
+        messages.append(m)
+        if settings.keepHistory { history.append(m) }
+        if messages.count > 200 { messages.removeFirst(messages.count - 200) }
+    }
+
+    private func replaceMessage(_ m: ChatMessage) {
+        if let i = messages.firstIndex(where: { $0.id == m.id }) { messages[i] = m }
+    }
+
+    func clearConversation() {
+        messages = []
+        history.clear()
+        brain.reset()
+    }
+
+    // MARK: Errors
+
+    func setError(_ reason: String, fix: Fix) {
+        error = (reason, fix)
+        errorClearTask?.cancel()
+        errorClearTask = Task {
+            try? await Task.sleep(for: .seconds(12))
+            if !Task.isCancelled { self.error = nil }
+        }
+    }
+
+    func clearError() { error = nil; errorClearTask?.cancel() }
+
+    func fixError() {
+        guard let fix = error?.fix else { return }
+        clearError()
+        switch fix {
+        case .micSettings: Permissions.openSettings("Privacy_Microphone")
+        case .speechSettings: Permissions.openSettings("Privacy_SpeechRecognition")
+        case .modelSettings: showSettings("Models & agents")
+        case .openSettings: showSettings(nil)
+        case .retry: retryLast()
+        }
+    }
+
+    // MARK: Model status
+
+    func refreshModelStatus() async {
+        do {
+            let ids = try await brain.client.models()
+            modelOnline = true
+            availableModels = ids
+        } catch {
+            modelOnline = false
+        }
+    }
+
+    private(set) var availableModels: [String] = []
+
+    /// Header label, e.g. "GEMMA 4 LOCAL".
+    var modelDisplayName: String {
+        let id = settings.routingModel
+        if id.lowercased().contains("gemma-4") || id.lowercased().contains("gemma4") { return "Gemma 4 local" }
+        return id + (modelOnline == false ? " · offline" : "")
+    }
+
+    // MARK: Attachments
+
+    func attach(urls: [URL]) {
+        for u in urls {
+            if let a = try? attachmentsStore.importFile(u) { pendingAttachments.append(a) }
+        }
+        if !urls.isEmpty { showPanel() }
+    }
+
+    func attach(image: NSImage, name: String = "pasted.png") {
+        if let a = try? attachmentsStore.importImage(image, name: name) { pendingAttachments.append(a) }
+    }
+
+    func attachScreenshot() {
+        Task {
+            if Permissions.screenRecording != .allowed, !Permissions.requestScreenRecording() {
+                setError("screen recording off", fix: .openSettings)
+                Permissions.openSettings("Privacy_ScreenCapture")
+                return
+            }
+            do {
+                let img = try await Screenshot.captureMainDisplay()
+                attach(image: img, name: "screenshot-\(Date.now.formatted(.iso8601.time(includingFractionalSeconds: false)).replacingOccurrences(of: ":", with: "")).png")
+                showPanel()
+            } catch {
+                setError("screenshot failed", fix: .openSettings)
+            }
+        }
+    }
+
+    func removeAttachment(_ id: UUID) {
+        guard let a = pendingAttachments.first(where: { $0.id == id }) else { return }
+        pendingAttachments.removeAll { $0.id == id }
+        attachmentsStore.discard([a])
+    }
+
+    // MARK: BrainHost
+
+    var workflowList: [Workflow] { workflows.workflows }
+
+    func confirm(_ request: ConfirmationRequest) async -> ConfirmationDecision {
+        let decision = await confirmations.ask(request)
+        confirmListenTask?.cancel()
+        if voice.isListening { voice.cancelListening() }
+        return decision
+    }
+
+    /// Called by the confirmation window when a slip appears: listens for "yes"/"no" if enabled.
+    func confirmationPresented() {
+        guard settings.confirmByVoice, Permissions.microphone == .allowed else { return }
+        confirmListenTask?.cancel()
+        confirmListenTask = Task {
+            try? await Task.sleep(for: .milliseconds(300))
+            do { try await voice.beginListening() } catch { return }
+            let deadline = Date.now.addingTimeInterval(10)
+            while !Task.isCancelled, Date.now < deadline, confirmations.current != nil {
+                if confirmations.handleSpoken(voice.partial) { break }
+                try? await Task.sleep(for: .milliseconds(150))
+            }
+            if voice.isListening { voice.cancelListening() }
+        }
+    }
+
+    func delegate(agent: AgentKind?, task: String, directory: String?, spokenAsk: String,
+                  attachments: [Attachment], messageID: UUID) async -> DelegationOutcome {
+        await delegate(agent: agent, task: task, directory: directory, spokenAsk: spokenAsk, attachments: attachments,
+                       messageID: messageID, edits: nil, skipConfirm: false, source: "Agent delegation")
+    }
+
+    func delegate(agent requested: AgentKind?, task: String, directory: String?, spokenAsk: String,
+                  attachments: [Attachment], messageID: UUID, edits: EditPermission?, skipConfirm: Bool,
+                  source: String) async -> DelegationOutcome {
+        var agent = requested ?? (settings.claude.enabled ? .claude : .codex)
+        if !settings.agent(agent).enabled { agent = agent == .claude ? .codex : .claude }
+        guard settings.agent(agent).enabled else { return .failed("no coding agent is enabled") }
+        var folder = (directory?.isEmpty == false ? directory! : settings.defaultFolder)
+        var permission = edits ?? settings.agent(agent).defaultEdits
+
+        if !skipConfirm {
+            let d = await confirm(ConfirmationRequest(kind: .agent(prompt: task, agent: agent, folder: folder, edits: permission),
+                                                      source: source, question: "Hand this to \(agent.displayName)?"))
+            guard d.approved else { return .declined }
+            agent = d.agent ?? agent
+            folder = d.folder ?? folder
+            permission = d.edits ?? permission
+        }
+
+        var job = AgentJob(runner: agent == .claude ? .claude : .codex, title: String(task.prefix(60)), prompt: task,
+                           spokenAsk: spokenAsk, directory: folder.abbreviatingHome, permission: permission)
+        job.attachmentPaths = attachments.compactMap { $0.url?.path }
+        job.messageID = messageID
+        tasks.add(job)
+        attachmentsStore.retain(attachments, for: job.id)
+        let id = job.id
+        Task {
+            let title = await brain.title(for: task)
+            tasks.update(id) { $0.title = title }
+        }
+        startOrQueue(id)
+        return .started(tasks.job(id) ?? job)
+    }
+
+    private func startOrQueue(_ id: UUID) {
+        if runner.runningCount < max(1, settings.maxConcurrentJobs) {
+            runner.start(id)
+        } else {
+            tasks.update(id) { $0.status = .queued; $0.log.append(.init(date: .now, text: "queued — another job is running", kind: .info)) }
+        }
+    }
+
+    func runWorkflow(named name: String, after: String, messageID: UUID) async -> String {
+        guard let w = workflows.workflow(named: name) else { return "no workflow called \(name)" }
+        return await executeWorkflow(w, after: after, messageID: messageID, attachments: [])
+    }
+
+    /// Runs a workflow from the panel link or hotkey.
+    func runWorkflowFromUI(_ id: UUID) {
+        guard let w = workflows.workflows.first(where: { $0.id == id }) else { return }
+        send(w.primaryPhrase, spoken: false)
+    }
+
+    func runWorkflowFromUI(named name: String) {
+        guard let w = workflows.workflow(named: name) else { return }
+        send(w.primaryPhrase, spoken: false)
+    }
+
+    func executeWorkflow(_ w: Workflow, after: String, messageID: UUID, attachments: [Attachment]) async -> String {
+        let body = ContextVariables.expand(w.template, after: after)
+        let skip = !w.confirmBeforeRunning || w.alwaysAllow
+        switch w.action {
+        case .askModel:
+            do {
+                return try await brain.client.complete(model: settings.routingModel,
+                                                       messages: [.system("You are Haku. Be concise. Wrap paths in backticks."), .user(body)])
+            } catch {
+                setError("model offline", fix: .modelSettings)
+                return "The model isn't answering."
+            }
+        case .shell, .script:
+            if !skip {
+                let consequences = await CommandRisk.assess(body, cwd: w.folder)
+                let kind: ConfirmationRequest.Kind = w.action == .shell
+                    ? .shell(command: body, cwd: w.folder)
+                    : .script(name: w.name, body: body, cwd: w.folder)
+                let d = await confirm(ConfirmationRequest(
+                    kind: kind,
+                    source: "\(w.action == .shell ? "Shell command" : "Script") · workflow “\(w.name)”",
+                    question: w.action == .shell ? "Run this command?" : "Run this script?",
+                    consequences: consequences,
+                    alwaysAllowLabel: w.action == .shell ? "Don't ask again for this workflow" : "Don't ask again for this script",
+                    workflowID: w.id))
+                guard d.approved else { return "Okay, didn't run it." }
+                if d.alwaysAllow { var u = w; u.alwaysAllow = true; workflows.upsert(u) }
+            }
+            let r = await ShellRunner.run(body, cwd: w.folder, timeout: 600)
+            let last = r.output.split(separator: "\n").last.map(String.init) ?? ""
+            return r.exitCode == 0
+                ? "Done\(last.isEmpty ? "." : ": \(last.prefix(140))")"
+                : "That failed (exit \(r.exitCode))\(last.isEmpty ? "." : ": ==\(last.prefix(120))==")"
+        case .agent:
+            let outcome = await delegate(agent: w.agent, task: body, directory: w.folder, spokenAsk: w.primaryPhrase + (after.isEmpty ? "" : " " + after),
+                                         attachments: attachments, messageID: messageID,
+                                         edits: w.allowEditsWithoutAsking ? .allowed : nil, skipConfirm: skip,
+                                         source: "Agent delegation · workflow “\(w.name)”")
+            switch outcome {
+            case .started(let job):
+                return "Handed to \(job.runner.displayName) in `\(job.directory ?? "~")`. I'll note it in the margin when it's done."
+            case .declined: return "Okay, not sending it."
+            case .failed(let why): return "Couldn't start that: \(why)"
+            }
+        }
+    }
+
+    // MARK: Jobs
+
+    func cancelJob(_ id: UUID) { runner.cancel(id) }
+
+    func retryJob(_ id: UUID) {
+        guard let old = tasks.job(id) else { return }
+        var job = AgentJob(runner: old.runner, title: old.title, prompt: old.prompt, spokenAsk: old.spokenAsk,
+                           directory: old.directory, permission: old.permission)
+        job.messageID = old.messageID
+        tasks.add(job)
+        startOrQueue(job.id)
+    }
+
+    func approveEdits(_ id: UUID) {
+        guard let job = tasks.job(id), job.status == .awaitingApproval else { return }
+        runner.start(id, resume: true)
+    }
+
+    private func jobFinished(_ job: AgentJob) {
+        attachmentsStore.release(job: job.id)
+        // Start the next queued job.
+        if let next = tasks.jobs.last(where: { $0.status == .queued }) { startOrQueue(next.id) }
+        guard job.status != .cancelled else { return }
+
+        Task {
+            let sentence = await brain.spokenSummary(of: job)
+            let title = job.status == .failed ? "\(job.runner.displayName) failed" : job.status == .awaitingApproval
+                ? "\(job.runner.displayName) has changes to approve" : "\(job.runner.displayName) finished"
+            Notifier.post(title: title, body: "\(job.title) — \(sentence)", id: job.id.uuidString)
+            if settings.speakReplies != .never { await voice.speak(sentence, allowVoiceBargeIn: false) }
+
+            if job.status == .awaitingApproval {
+                let d = await confirm(ConfirmationRequest(
+                    kind: .applyEdits(jobTitle: job.title, agent: job.runner.displayName, proposal: job.summary ?? ""),
+                    source: "\(job.runner.displayName) · \(job.directory ?? "")", question: "Apply these changes?"))
+                if d.approved { approveEdits(job.id) } else {
+                    tasks.update(job.id) { $0.status = .done; $0.log.append(.init(date: .now, text: "changes not applied", kind: .info)) }
+                }
+            }
+        }
+    }
+}

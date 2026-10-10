@@ -5,6 +5,13 @@ options:
     macOS: "15.0"
   createIntermediateGroups: true
   groupSortPosition: top
+packages:
+  KeyboardShortcuts:
+    url: https://github.com/sindresorhus/KeyboardShortcuts
+    from: 2.2.0
+  WhisperKit:
+    url: https://github.com/argmaxinc/WhisperKit
+    from: 0.9.0
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -35,6 +42,11 @@ targets:
         NSMicrophoneUsageDescription: "Haku listens while you hold the talk hotkey or answer a prompt."
         NSSpeechRecognitionUsageDescription: "Haku turns what you say into text on this Mac."
         NSAppleEventsUsageDescription: "Haku runs AppleScripts you approve."
+        NSScreenCaptureUsageDescription: "Haku attaches a screenshot only when you ask it to."
+        NSUserNotificationsUsageDescription: "Haku tells you when an agent job finishes."
+    dependencies:
+      - package: KeyboardShortcuts
+      - package: WhisperKit
     entitlements:
       path: Haku/Haku.entitlements
       properties:

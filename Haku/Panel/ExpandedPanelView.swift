@@ -10,12 +10,20 @@ struct ExpandedPanelView: View {
     var date: Date = .now
     @Binding var draft: String
     var actions = PanelActions()
+    var pending: [Attachment] = []
+    /// What the recognizer has heard so far while listening.
+    var liveTranscript: String?
+    var thinkingLabel: String?
 
     var body: some View {
         VStack(spacing: 0) {
             PanelHeader(modelName: modelName, date: date, actions: actions)
             HRule()
-            ConversationView(messages: messages, notes: notes, actions: actions)
+            ConversationView(messages: messages, notes: notes, actions: actions,
+                             liveTranscript: liveTranscript, thinkingLabel: thinkingLabel)
+            if !pending.isEmpty {
+                PendingAttachmentsRow(attachments: pending, onRemove: actions.removeAttachment)
+            }
             if !workflows.isEmpty {
                 HRule()
                 WorkflowsRow(workflows: workflows, onRun: actions.runWorkflow)
@@ -41,6 +49,9 @@ struct PanelActions {
     var runWorkflow: (String) -> Void = { _ in }
     var showLog: (UUID) -> Void = { _ in }
     var cancelJob: (UUID) -> Void = { _ in }
+    var removeAttachment: (UUID) -> Void = { _ in }
+    var pasteImage: (NSImage) -> Void = { _ in }
+    var pasteFiles: ([URL]) -> Void = { _ in }
 }
 
 struct PanelHeader: View {
@@ -88,13 +99,19 @@ struct ConversationView: View {
     let messages: [ChatMessage]
     let notes: [UUID: MarginNote]
     var actions = PanelActions()
+    var liveTranscript: String?
+    var thinkingLabel: String?
 
     var body: some View {
         if staticRendering {
             rows.frame(maxHeight: .infinity, alignment: .top).clipped()
                 .background(alignment: .trailing) { MarginRule().frame(width: PanelMetrics.marginWidth, alignment: .leading) }
         } else {
-            ScrollView { rows }
+            ScrollViewReader { proxy in
+                ScrollView { rows }
+                    .onChange(of: messages.last?.plainText) { _, _ in proxy.scrollTo("bottom", anchor: .bottom) }
+                    .onChange(of: liveTranscript) { _, _ in proxy.scrollTo("bottom", anchor: .bottom) }
+            }
                 .scrollIndicators(.never)
                 .defaultScrollAnchor(.bottom)
                 .background(alignment: .trailing) {
@@ -123,7 +140,25 @@ struct ConversationView: View {
                         .padding(.horizontal, PanelMetrics.marginPadding.h)
                         .frame(width: PanelMetrics.marginWidth, alignment: .leading)
                     }
+                    .id(msg.id)
                 }
+                if let live = liveTranscript, !live.isEmpty {
+                    MessageView(message: ChatMessage(.user, live + "…"))
+                        .opacity(0.7)
+                        .padding(.leading, d.bodyPaddingH + 1)
+                        .padding(.trailing, PanelMetrics.marginWidth + d.bodyPaddingH)
+                }
+                if let label = thinkingLabel {
+                    Text(label).textRole(.note, theme).foregroundStyle(theme.colors.muted)
+                        .padding(.leading, d.bodyPaddingH + 1)
+                }
+                if messages.isEmpty && liveTranscript == nil {
+                    Text("Hold \(HotkeyManager.display(.holdToTalk)) and say what you need, or write below.")
+                        .textRole(.label, theme).foregroundStyle(theme.colors.muted)
+                        .padding(.leading, d.bodyPaddingH + 1)
+                        .padding(.trailing, PanelMetrics.marginWidth + d.bodyPaddingH)
+                }
+                Color.clear.frame(height: 1).id("bottom")
             }
             .padding(.vertical, d.bodyPaddingV)
     }
@@ -223,11 +258,18 @@ struct TapedPhoto: View {
     @Environment(\.theme) private var theme
     let attachment: Attachment
     var image: Image?
+    var onRemove: (() -> Void)?
+
+    private var loaded: Image? {
+        if let image { return image }
+        guard attachment.isImage, let url = attachment.url, let ns = NSImage(contentsOf: url) else { return nil }
+        return Image(nsImage: ns)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.xs) {
             Group {
-                if let image {
+                if let image = loaded {
                     image.resizable().scaledToFill()
                 } else {
                     // Placeholder lines (as in the mockup) until a thumbnail loads.
@@ -255,9 +297,35 @@ struct TapedPhoto: View {
                 .frame(width: PanelMetrics.tape.width, height: PanelMetrics.tape.height)
                 .offset(y: PanelMetrics.tapeOffset)
         }
+        .overlay(alignment: .topTrailing) {
+            if let onRemove {
+                Button(action: onRemove) { Text("×").font(theme.font(.ui)).foregroundStyle(theme.colors.muted) }
+                    .buttonStyle(.plain).padding(4).help("Remove attachment")
+            }
+        }
         .rotationEffect(.degrees(PanelMetrics.photoRotation))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Attachment \(attachment.fileName)")
+    }
+}
+
+/// Attachments waiting to be sent with the next message.
+struct PendingAttachmentsRow: View {
+    @Environment(\.theme) private var theme
+    let attachments: [Attachment]
+    var onRemove: (UUID) -> Void
+
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: Spacing.s14) {
+                ForEach(attachments) { a in
+                    TapedPhoto(attachment: a, onRemove: { onRemove(a.id) })
+                }
+            }
+            .padding(.horizontal, PanelMetrics.inputPadding.leading)
+            .padding(.top, Spacing.s14).padding(.bottom, Spacing.s8)
+        }
+        .scrollIndicators(.never)
     }
 }
 
@@ -298,6 +366,19 @@ struct InputBar: View {
                     else { Rectangle().fill(theme.colors.ink).frame(height: Strokes.inputUnderline) }
                 }
                 .onSubmit { actions.send(draft) }
+                .onPasteCommand(of: [.fileURL, .png, .tiff, .image]) { providers in
+                    for p in providers {
+                        if p.canLoadObject(ofClass: URL.self) {
+                            _ = p.loadObject(ofClass: URL.self) { url, _ in
+                                if let url { Task { @MainActor in actions.pasteFiles([url]) } }
+                            }
+                        } else if p.canLoadObject(ofClass: NSImage.self) {
+                            _ = p.loadObject(ofClass: NSImage.self) { img, _ in
+                                if let img = img as? NSImage { Task { @MainActor in actions.pasteImage(img) } }
+                            }
+                        }
+                    }
+                }
                 .accessibilityLabel("Message Haku")
             micButton
         }
