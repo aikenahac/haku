@@ -79,5 +79,6 @@ This log covers gaps, ambiguities, and decisions I made where `design/` was sile
 
 ## Open
 
-- **Hotkeys:** ⌥Space doesn't clash with any macOS default (Spotlight is ⌘Space), but the ChatGPT and Raycast apps commonly bind it. Settings will flag the clash when registration fails. ⌥⇧T has no system default.
+- **Hotkeys:** hold-to-talk now defaults to **⌃⌥Space** (changed 2026-10-10 at your request; ⌥Space clashes with common launchers). Existing installs on the old ⌥Space default are migrated once; custom shortcuts are kept. The widget hint and input placeholder read the live shortcut, written per theme (⌃⌥ SPACE / ⌃⌥ SPC / ctrl+opt+space). Open panel ⌥⇧Space and Tasks ⌥⇧T are unchanged.
+- **Voice confirmations** only accept a short yes/no phrase (at most 3 words, from a fixed list, held steady for 0.5 s). Talking in the background can never approve a slip. Every approve/deny is logged with its source in `~/Library/Application Support/Haku/haku.log`.
 - **App icon:** the vector is in place (`AppIconView`). Exporting the PNG `.appiconset` and the template menu-bar images happens in v0b, together with the status item.
