@@ -164,18 +164,19 @@ final class AppSettings {
             // Decode leniently: unknown/missing keys fall back to defaults.
             if let decoded = try? JSONDecoder().decode(PartialStored.self, from: data) { decoded.apply(to: &s) }
         }
+        // One-time move of the old default (~/code) to ~/haku; a folder you picked yourself is kept.
+        if s.defaultFolder == "~/code", !defaults.bool(forKey: "settings.migrated.defaultFolder.v2") {
+            s.defaultFolder = "~/haku"
+        }
+        defaults.set(true, forKey: "settings.migrated.defaultFolder.v2")
         serverType = s.serverType; endpoint = s.endpoint; routingModel = s.routingModel
         escalationModel = s.escalationModel; fallback = s.fallback; apiKey = s.apiKey; lmsPath = s.lmsPath
         claude = s.claude; codex = s.codex; defaultFolder = s.defaultFolder; maxConcurrentJobs = s.maxConcurrentJobs
         sttEngine = s.sttEngine; languages = s.languages; speakReplies = s.speakReplies
         voiceIdentifier = s.voiceIdentifier; speechRate = s.speechRate; confirmByVoice = s.confirmByVoice
         whisperModel = s.whisperModel; wakeWordEnabled = s.wakeWordEnabled; wakeSensitivity = s.wakeSensitivity
-        // One-time move of the old default (~/code) to ~/haku; a folder you picked yourself is kept.
-        if s.defaultFolder == "~/code", !defaults.bool(forKey: "settings.migrated.defaultFolder") {
-            s.defaultFolder = "~/haku"
-        }
-        defaults.set(true, forKey: "settings.migrated.defaultFolder")
         onboardingDone = s.onboardingDone; showWidget = s.showWidget; showInDock = s.showInDock; keepHistory = s.keepHistory
+        save()   // persist defaults/migrations (didSet doesn't run in init)
     }
 
     func agent(_ kind: AgentKind) -> AgentConfig { kind == .claude ? claude : codex }
