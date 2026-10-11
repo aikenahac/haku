@@ -24,6 +24,16 @@ This log covers gaps, ambiguities, and decisions I made where `design/` was sile
   - Otherwise a soft “Tink” plays and Haku listens hands-free, stopping after about 1.3 s of silence. If nothing is said within 6 s it gives up.
 - **Visual:** the design has no state for wake listening, so the widget stays in its idle state. The macOS mic indicator shows while name listening is on.
 
+## Main window (built 2026-10-11, not in the mockups)
+
+- **Built from existing Margin parts only:**
+  - Sidebar: wordmark, chats grouped Pinned / Today / Yesterday / Previous 7 days / Earlier, search, and Tasks / Workflows / Settings nav items in the Settings-nav style.
+  - The selected chat is marked with the `marginLine` rule.
+  - Chat view: the panel's conversation, margin and input, capped at 860 pt wide.
+  - Tasks, Workflows and Settings render embedded, without their own close buttons.
+- **Conversations:** the widget, panel and window share the current chat. A new chat starts after 2 h idle or on ⌘N. Titles start from the first message and are then refined by Gemma.
+- **Dock:** "Show in Dock" is on by default. Turning it off makes Haku a menu-bar-and-widget-only app again.
+
 ## Tokens
 
 - **Single source:** `tools/design-tokens/colors.json` → `generate_assets.py` → `Haku/Resources/Colors.xcassets`. Don't edit the catalog by hand.

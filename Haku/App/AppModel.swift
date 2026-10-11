@@ -340,7 +340,23 @@ final class AppModel: BrainHost {
             availableModels = ids
         } catch {
             modelOnline = false
+            // LM Studio's port is configurable (Bionic often uses 1235): look for it nearby.
+            if settings.serverType == .lmStudio, let found = await Self.findLocalServer(excluding: settings.endpoint) {
+                Log.info("model server not at \(settings.endpoint); found it at \(found)")
+                settings.endpoint = found
+                await refreshModelStatus()
+            }
         }
+    }
+
+    /// Probes common local OpenAI-compatible ports and returns the first that answers `/v1/models`.
+    static func findLocalServer(excluding current: String) async -> String? {
+        for port in [1234, 1235, 1236, 1237, 8080, 11434] {
+            let url = "http://localhost:\(port)/v1"
+            if url == current { continue }
+            if (try? await OpenAIClient(endpoint: url).models()) != nil { return url }
+        }
+        return nil
     }
 
     private(set) var availableModels: [String] = []

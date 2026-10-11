@@ -101,6 +101,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Dock icon + menu bar when "Show in Dock" is on; otherwise a menu-bar/widget-only accessory app.
     private func applyDockPolicy() {
         NSApp.setActivationPolicy(settings.showInDock ? .regular : .accessory)
+        // An LSUIElement app switched to .regular at runtime gets a placeholder Dock icon unless it sets one.
+        if settings.showInDock {
+            let icon = NSImage(named: "AppIcon")
+            Log.info("dock icon \(icon == nil ? "missing" : "set") \(icon?.size ?? .zero)")
+            if let icon { NSApp.applicationIconImage = icon }
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
