@@ -76,7 +76,7 @@ enum SampleConversation {
 
     static let messages: [ChatMessage] = [
         ChatMessage(.user, "Run the devenv tests and tell me what's failing."),
-        ChatMessage(role: .haku, spans: [.text("Handed to Claude Code in "), .path("~/code/devenv"),
+        ChatMessage(role: .haku, spans: [.text("Handed to Claude Code in "), .path("~/haku/devenv"),
                                          .text(". I'll note it in the margin when it's done.")], jobID: jobID),
         ChatMessage(role: .user, spans: [.text("What's this one about?")],
                     attachments: [Attachment(fileName: "caddy-error.png")]),
