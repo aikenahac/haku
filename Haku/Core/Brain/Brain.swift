@@ -8,6 +8,8 @@ protocol BrainHost: AnyObject {
     func delegate(agent: AgentKind?, task: String, directory: String?, spokenAsk: String,
                   attachments: [Attachment], messageID: UUID) async -> DelegationOutcome
     func runWorkflow(named: String, after: String, messageID: UUID) async -> String
+    /// Excerpts from earlier chats matching `query` (plain text for the model).
+    func searchHistory(_ query: String) -> String
     var workflowList: [Workflow] { get }
 }
 
@@ -168,7 +170,9 @@ final class Brain {
                         terminal = "Couldn't start that: \(why)"
                     }
                 default:
+                    if call.function.name == "search_history" { onStatus("checking earlier chats") }
                     let result = await execute(call.function.name, args, messageID: messageID)
+                    if call.function.name == "search_history" { onStatus("") }
                     turn.append(.tool(call.id, name: call.function.name, result))
                 }
                 if terminal != nil { break }
@@ -254,6 +258,8 @@ final class Brain {
                     properties: ["name": LLMTool.prop("string", "Workflow name"),
                                  "after": LLMTool.prop("string", "Anything the user said after the trigger phrase")], required: ["name"]),
             LLMTool("list_shortcuts", "List the user's Apple Shortcuts.", properties: [:], required: []),
+            LLMTool("search_history", "Search the user's earlier chats when they refer to something said before (\"that script from yesterday\", \"what did you say about…\"). Returns matching excerpts.",
+                    properties: ["query": LLMTool.prop("string", "Key words to look for, e.g. \"backup script rsync\"")], required: ["query"]),
         ]
         if !agents.isEmpty {
             tools.append(LLMTool("delegate_agent",
@@ -299,6 +305,8 @@ final class Brain {
                                                             question: "Run this command?", consequences: consequences))
             guard d?.approved == true else { return "the user declined" }
             return await ShellRunner.run(cmd, cwd: dir).summary
+        case "search_history":
+            return host?.searchHistory(args["query"]?.stringValue ?? "") ?? "no host"
         case "run_workflow":
             let n = args["name"]?.stringValue ?? ""
             return await host?.runWorkflow(named: n, after: args["after"]?.stringValue ?? "", messageID: messageID) ?? "no host"
@@ -340,6 +348,7 @@ final class Brain {
         - Hard reasoning or long writing: call `escalate`.
         - Shell/AppleScript only when nothing else fits; the user approves each one.
         - When the user's words match a saved workflow, call `run_workflow`.
+        - Each voice command starts a fresh chat. If the user refers to something earlier that isn't in this chat, call `search_history` first.
         Formatting: wrap file paths in backticks. You may highlight the single most important phrase with ==double equals==. No other markdown.
         Attachments are files you can't see; pass them on to agents, don't describe them.
         \(flows.isEmpty ? "" : "\nSaved workflows:\n" + flows)

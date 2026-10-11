@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-/// One chat thread. The widget/panel always continue the current one; the main window lists them all.
+/// One chat thread. Typed input continues the current one; voice triggers start fresh unless it's a quick follow-up.
 struct Conversation: Codable, Identifiable, Equatable, Sendable {
     struct Entry: Codable, Equatable, Sendable {
         var id: UUID
@@ -54,6 +54,10 @@ final class ConversationStore {
     @ObservationIgnored private var saveTasks: [UUID: Task<Void, Never>] = [:]
     /// A new chat starts automatically after this much quiet.
     static let idleGap: TimeInterval = 2 * 3600
+    /// A voice trigger continues the current chat only within this long of its last message.
+    static let followUpGap: TimeInterval = 120
+    /// Clock (tests move it forward).
+    @ObservationIgnored var now: () -> Date = { .now }
 
     init(directory: URL = AppPaths.support.appendingPathComponent("conversations", isDirectory: true)) {
         dir = directory
@@ -72,14 +76,21 @@ final class ConversationStore {
 
     /// The conversation the next message belongs to (starts a new one after a long gap).
     func currentForSending() -> Conversation {
-        if let c = current, Date.now.timeIntervalSince(c.updated) < Self.idleGap || c.entries.isEmpty { return c }
+        if let c = current, now().timeIntervalSince(c.updated) < Self.idleGap || c.entries.isEmpty { return c }
+        return newConversation()
+    }
+
+    /// The conversation a wake word / push-to-talk command belongs to: fresh, unless it follows right on the last exchange.
+    func forVoiceTrigger() -> Conversation {
+        if let c = current, c.entries.isEmpty || now().timeIntervalSince(c.updated) < Self.followUpGap { return c }
         return newConversation()
     }
 
     @discardableResult
     func newConversation() -> Conversation {
         if let c = current, c.entries.isEmpty { return c }
-        let c = Conversation(title: "New chat")
+        var c = Conversation(title: "New chat")
+        c.created = now(); c.updated = now()
         conversations.insert(c, at: 0)
         currentID = c.id
         save(c.id)
@@ -89,7 +100,7 @@ final class ConversationStore {
     func append(_ m: ChatMessage, to id: UUID) {
         update(id) { c in
             c.entries.append(.init(id: m.id, role: m.role, text: m.markup, attachmentNames: m.attachments.map(\.fileName),
-                                   jobID: m.jobID, date: .now))
+                                   jobID: m.jobID, date: now()))
             if c.title == "New chat", m.role == .user { c.title = Conversation.provisionalTitle(from: m.plainText) }
         }
     }
@@ -99,7 +110,7 @@ final class ConversationStore {
             if let i = c.entries.firstIndex(where: { $0.id == m.id }) {
                 c.entries[i].text = m.markup
             } else {
-                c.entries.append(.init(id: m.id, role: m.role, text: m.markup, attachmentNames: [], jobID: m.jobID, date: .now))
+                c.entries.append(.init(id: m.id, role: m.role, text: m.markup, attachmentNames: [], jobID: m.jobID, date: now()))
             }
         }
     }
@@ -134,11 +145,50 @@ final class ConversationStore {
         }
     }
 
+    /// Earlier chats mentioning the query's words, as short plain-text excerpts for the model.
+    /// Ranked by how many distinct words hit, then recency; capped at `maxChars`.
+    func searchSnippets(_ query: String, excluding: UUID?, limit: Int = 3, maxChars: Int = 1500) -> String {
+        let words = Set(query.lowercased().split { !$0.isLetter && !$0.isNumber }.map(String.init).filter { $0.count >= 4 })
+        guard !words.isEmpty else { return "no earlier chats matched" }
+        let plain: (String) -> String = { $0.replacingOccurrences(of: "==", with: "").replacingOccurrences(of: "`", with: "") }
+        var scored: [(convo: Conversation, hits: Int)] = []
+        for c in conversations where c.id != excluding {
+            let text = (c.title + " " + c.entries.map(\.text).joined(separator: " ")).lowercased()
+            let hits = words.filter { text.contains($0) }.count
+            if hits > 0 { scored.append((c, hits)) }
+        }
+        scored.sort { a, b in a.hits != b.hits ? a.hits > b.hits : a.convo.updated > b.convo.updated }
+        let ranked = scored.prefix(limit)
+        guard !ranked.isEmpty else { return "no earlier chats matched" }
+        let fmt = RelativeDateTimeFormatter()
+        var out = ""
+        for (c, _) in ranked {
+            var block = "Chat \"\(c.title)\" (\(fmt.localizedString(for: c.updated, relativeTo: now()))):\n"
+            // Matching entries plus the turn after each (usually Haku's answer).
+            var picked = IndexSet()
+            for (i, e) in c.entries.enumerated() where words.contains(where: e.text.lowercased().contains) {
+                picked.insert(i)
+                if i + 1 < c.entries.count { picked.insert(i + 1) }
+            }
+            if picked.isEmpty { picked.insert(integersIn: 0..<min(2, c.entries.count)) }
+            for i in picked {
+                let e = c.entries[i]
+                block += "\(e.role == .user ? "User" : "Haku"): \(plain(e.text).prefix(300))\n"
+            }
+            if out.count + block.count > maxChars {
+                if out.isEmpty { out = String(block.prefix(maxChars)) }
+                break
+            }
+            out += block + "\n"
+        }
+        return out.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private func update(_ id: UUID, touch: Bool = true, _ change: (inout Conversation) -> Void) {
         guard let i = conversations.firstIndex(where: { $0.id == id }) else { return }
         change(&conversations[i])
         if touch {
-            conversations[i].updated = .now
+            conversations[i].updated = now()
             // Most recent first.
             let c = conversations.remove(at: i)
             conversations.insert(c, at: 0)

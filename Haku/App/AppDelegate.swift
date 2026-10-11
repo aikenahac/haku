@@ -117,7 +117,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     /// haku://panel, haku://tasks, haku://settings, haku://ask?text=… (fills the input; never sends on its own).
-    /// Debug builds also accept haku://send?text=… for end-to-end testing.
+    /// Debug builds also accept haku://send?text=… (typed) and haku://say?text=… (as a voice trigger) for end-to-end testing.
     func application(_ application: NSApplication, open urls: [URL]) {
         for url in urls where url.scheme == "haku" {
             let text = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "text" }?.value ?? ""
@@ -134,6 +134,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             case "send":
                 panel.show()
                 model.send(text, spoken: false)
+            case "say":
+                model.send(text, spoken: false, origin: .voiceTrigger)
             case "snapshot": snapshotWindows(to: text)
             case "approve": model.confirmations.approve(source: "url")
             case "deny": model.confirmations.deny(source: "url")

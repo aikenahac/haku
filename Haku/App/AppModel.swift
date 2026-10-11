@@ -33,7 +33,7 @@ final class AppModel: BrainHost {
     private(set) var modelOnline: Bool?
     private(set) var hovering = false
     @ObservationIgnored private var turnTask: Task<Void, Never>?
-    @ObservationIgnored private var lastFailedInput: (String, Bool)?
+    @ObservationIgnored private var lastFailedInput: (text: String, spoken: Bool, conversation: UUID)?
     @ObservationIgnored private var confirmListenTask: Task<Void, Never>?
     @ObservationIgnored private var errorClearTask: Task<Void, Never>?
     @ObservationIgnored private var talkPressedAt: Date?
@@ -82,7 +82,7 @@ final class AppModel: BrainHost {
         guard confirmations.current == nil, !voice.isListening else { return }
         voice.stopSpeaking()
         if let after, after.split(separator: " ").count >= 2 {
-            send(after, spoken: true)
+            send(after, spoken: true, origin: .voiceTrigger)
         } else {
             startHandsFree()
         }
@@ -108,7 +108,7 @@ final class AppModel: BrainHost {
             }
             guard voice.isListening else { return }
             let text = await voice.endListening()
-            if !text.isEmpty { send(text, spoken: true) }
+            if !text.isEmpty { send(text, spoken: true, origin: .voiceTrigger) }
         }
     }
 
@@ -177,7 +177,7 @@ final class AppModel: BrainHost {
                 if !confirmations.handleSpoken(text) { /* not a yes/no; keep the slip up */ }
                 return
             }
-            send(text, spoken: true)
+            send(text, spoken: true, origin: .voiceTrigger)
         }
     }
 
@@ -204,11 +204,15 @@ final class AppModel: BrainHost {
         send(text.isEmpty ? "What's this?" : text, spoken: false)
     }
 
-    func send(_ text: String, spoken: Bool) {
+    /// Where an input came from: voice triggers start a fresh chat (unless it's a quick follow-up); typing continues the visible one.
+    enum InputOrigin { case voiceTrigger, typed }
+
+    func send(_ text: String, spoken: Bool, origin: InputOrigin = .typed, in conversationID: UUID? = nil) {
         clearError()
         let attachments = pendingAttachments
         pendingAttachments = []
-        let convo = conversations.currentForSending()
+        let convo = conversationID.flatMap(conversations.conversation)
+            ?? (origin == .voiceTrigger ? conversations.forVoiceTrigger() : conversations.currentForSending())
         conversations.currentID = convo.id
         if brainConversationID != convo.id {
             brain.seed(convo.messages)
@@ -217,7 +221,7 @@ final class AppModel: BrainHost {
         let cid = convo.id
         let user = ChatMessage(role: .user, spans: [.text(text)], attachments: attachments)
         conversations.append(user, to: cid)
-        lastFailedInput = (text, spoken)
+        lastFailedInput = (text, spoken, cid)
 
         turnTask?.cancel()
         turnTask = Task {
@@ -276,8 +280,9 @@ final class AppModel: BrainHost {
     }
 
     func retryLast() {
-        guard let (text, spoken) = lastFailedInput else { return }
-        send(text, spoken: spoken)
+        // Retry in the chat it failed in, not a fresh one.
+        guard let last = lastFailedInput else { return }
+        send(last.text, spoken: last.spoken, in: last.conversation)
     }
 
     /// Starts a fresh chat (widget panel "new chat", ⌘N).
@@ -407,6 +412,10 @@ final class AppModel: BrainHost {
     // MARK: BrainHost
 
     var workflowList: [Workflow] { workflows.workflows }
+
+    func searchHistory(_ query: String) -> String {
+        conversations.searchSnippets(query, excluding: conversations.currentID)
+    }
 
     func confirm(_ request: ConfirmationRequest) async -> ConfirmationDecision {
         let decision = await confirmations.ask(request)
