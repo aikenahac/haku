@@ -35,6 +35,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         themeManager.applyAppAppearance()
         guard !Self.isTestHost else { return }
         model = AppModel(settings: settings, themes: themeManager)
+        settings.ensureDefaultFolder()
 
         widget = WidgetController(model: model, themes: themeManager)
         panel = PanelController(model: model, themes: themeManager)

@@ -47,7 +47,7 @@ struct Workflow: Codable, Identifiable, Equatable, Sendable {
         Workflow(name: "Tidy Downloads", phrases: ["clean up downloads", "tidy downloads"], action: .shell,
                  folder: "~/Downloads", template: "find ~/Downloads -name \"*.dmg\" -mtime +30 -delete"),
         Workflow(name: "Review my branch", phrases: ["review this branch", "review my branch"], action: .agent,
-                 agent: .claude, folder: "~/code", template: "Review the current branch against main and list concrete problems. {after}"),
+                 agent: .claude, folder: "~/haku", template: "Review the current branch against main and list concrete problems. {after}"),
     ]
 }
 
@@ -60,8 +60,13 @@ final class WorkflowStore {
 
     init(url: URL = AppPaths.workflows) {
         self.url = url
-        if let saved = JSONFile.load([Workflow].self, from: url) {
+        if var saved = JSONFile.load([Workflow].self, from: url) {
+            // Starter workflows that still point at the old default folder follow it to ~/haku.
+            for i in saved.indices where saved[i].folder == "~/code" && Workflow.starters.contains(where: { $0.name == saved[i].name }) {
+                saved[i].folder = "~/haku"
+            }
             workflows = saved
+            JSONFile.save(saved, to: url)
         } else {
             workflows = Workflow.starters
             save()

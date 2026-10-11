@@ -456,6 +456,7 @@ final class AppModel: BrainHost {
         if !settings.agent(agent).enabled { agent = agent == .claude ? .codex : .claude }
         guard settings.agent(agent).enabled else { return .failed("no coding agent is enabled") }
         var folder = (directory?.isEmpty == false ? directory! : settings.defaultFolder)
+        if folder == settings.defaultFolder { settings.ensureDefaultFolder() }
         var permission = edits ?? settings.agent(agent).defaultEdits
 
         if !skipConfirm {

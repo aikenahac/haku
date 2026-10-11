@@ -138,7 +138,7 @@ final class AppSettings {
         var lmsPath = ""
         var claude = AgentConfig(binaryPath: "", enabled: true, defaultEdits: .askFirst)
         var codex = AgentConfig(binaryPath: "", enabled: true, defaultEdits: .readOnly)
-        var defaultFolder = "~/code"
+        var defaultFolder = "~/haku"
         var maxConcurrentJobs = 2
         var sttEngine: STTEngine = .onDevice
         var languages = ["en-US"]
@@ -170,6 +170,11 @@ final class AppSettings {
         sttEngine = s.sttEngine; languages = s.languages; speakReplies = s.speakReplies
         voiceIdentifier = s.voiceIdentifier; speechRate = s.speechRate; confirmByVoice = s.confirmByVoice
         whisperModel = s.whisperModel; wakeWordEnabled = s.wakeWordEnabled; wakeSensitivity = s.wakeSensitivity
+        // One-time move of the old default (~/code) to ~/haku; a folder you picked yourself is kept.
+        if s.defaultFolder == "~/code", !defaults.bool(forKey: "settings.migrated.defaultFolder") {
+            s.defaultFolder = "~/haku"
+        }
+        defaults.set(true, forKey: "settings.migrated.defaultFolder")
         onboardingDone = s.onboardingDone; showWidget = s.showWidget; showInDock = s.showInDock; keepHistory = s.keepHistory
     }
 
@@ -180,6 +185,11 @@ final class AppSettings {
     }
 
     var defaultFolderURL: URL { URL(fileURLWithPath: (defaultFolder as NSString).expandingTildeInPath) }
+
+    /// Creates the default agent folder if it doesn't exist yet.
+    func ensureDefaultFolder() {
+        try? FileManager.default.createDirectory(at: defaultFolderURL, withIntermediateDirectories: true)
+    }
 
     var primaryLocale: Locale { Locale(identifier: languages.first ?? "en-US") }
 
