@@ -88,6 +88,7 @@ struct TasksView: View {
 /// Header row shared by the app windows: serif title + trailing content + close.
 struct WindowHeader<Trailing: View>: View {
     @Environment(\.theme) private var theme
+    @Environment(\.embeddedInMainWindow) private var embedded
     let title: String
     @ViewBuilder var trailing: Trailing
 
@@ -95,13 +96,16 @@ struct WindowHeader<Trailing: View>: View {
         HStack(spacing: 18) {
             Text(title).textRole(.windowTitle, theme).foregroundStyle(theme.colors.ink)
             trailing
-            Button { NSApp.keyWindow?.performClose(nil) } label: { CloseGlyph() }
-                .buttonStyle(IconButtonStyle())
-                .keyboardShortcut("w", modifiers: .command)
-                .help("Close").accessibilityLabel("Close \(title.lowercased())")
+            if !embedded {
+                Button { NSApp.keyWindow?.performClose(nil) } label: { CloseGlyph() }
+                    .buttonStyle(IconButtonStyle())
+                    .keyboardShortcut("w", modifiers: .command)
+                    .help("Close").accessibilityLabel("Close \(title.lowercased())")
+            }
         }
-        .padding(.leading, 18).padding(.trailing, 10)
-        .frame(height: 54)
+        .padding(.leading, embedded ? 24 : 18).padding(.trailing, 10)
+        .padding(.top, embedded ? 26 : 0)
+        .frame(height: embedded ? 80 : 54)
     }
 }
 

@@ -79,7 +79,7 @@ final class AppWindow {
     let window: NSWindow
     private var closeObserver: Any?
 
-    init<V: View>(title: String, size: NSSize, minSize: NSSize? = nil, @ViewBuilder content: () -> V) {
+    init<V: View>(title: String, size: NSSize, minSize: NSSize? = nil, trafficLights: Bool = false, @ViewBuilder content: () -> V) {
         window = NSWindow(contentRect: NSRect(origin: .zero, size: size),
                           styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView],
                           backing: .buffered, defer: false)
@@ -94,7 +94,9 @@ final class AppWindow {
         window.center()
         window.setFrameAutosaveName("haku.\(title)")
         // The design draws its own header with a close button.
-        for b in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] { window.standardWindowButton(b)?.isHidden = true }
+        if !trafficLights {
+            for b in [NSWindow.ButtonType.closeButton, .miniaturizeButton, .zoomButton] { window.standardWindowButton(b)?.isHidden = true }
+        }
     }
 
     func show() {

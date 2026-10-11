@@ -103,6 +103,7 @@ final class AppSettings {
     var escalationModel: String { didSet { save() } }
     var fallback: FallbackPolicy { didSet { save() } }
     var apiKey: String { didSet { save() } }
+    var lmsPath: String { didSet { save() } }
 
     // Agents
     var claude: AgentConfig { didSet { save() } }
@@ -124,6 +125,7 @@ final class AppSettings {
     // General
     var onboardingDone: Bool { didSet { save() } }
     var showWidget: Bool { didSet { save() } }
+    var showInDock: Bool { didSet { save() } }
     var keepHistory: Bool { didSet { save() } }
 
     private struct Stored: Codable {
@@ -133,6 +135,7 @@ final class AppSettings {
         var escalationModel = "qwen3.8-27b"
         var fallback: FallbackPolicy = .tellMe
         var apiKey = ""
+        var lmsPath = ""
         var claude = AgentConfig(binaryPath: "", enabled: true, defaultEdits: .askFirst)
         var codex = AgentConfig(binaryPath: "", enabled: true, defaultEdits: .readOnly)
         var defaultFolder = "~/code"
@@ -148,6 +151,7 @@ final class AppSettings {
         var wakeSensitivity = 0.5
         var onboardingDone = false
         var showWidget = true
+        var showInDock = true
         var keepHistory = true
     }
 
@@ -161,12 +165,12 @@ final class AppSettings {
             if let decoded = try? JSONDecoder().decode(PartialStored.self, from: data) { decoded.apply(to: &s) }
         }
         serverType = s.serverType; endpoint = s.endpoint; routingModel = s.routingModel
-        escalationModel = s.escalationModel; fallback = s.fallback; apiKey = s.apiKey
+        escalationModel = s.escalationModel; fallback = s.fallback; apiKey = s.apiKey; lmsPath = s.lmsPath
         claude = s.claude; codex = s.codex; defaultFolder = s.defaultFolder; maxConcurrentJobs = s.maxConcurrentJobs
         sttEngine = s.sttEngine; languages = s.languages; speakReplies = s.speakReplies
         voiceIdentifier = s.voiceIdentifier; speechRate = s.speechRate; confirmByVoice = s.confirmByVoice
         whisperModel = s.whisperModel; wakeWordEnabled = s.wakeWordEnabled; wakeSensitivity = s.wakeSensitivity
-        onboardingDone = s.onboardingDone; showWidget = s.showWidget; keepHistory = s.keepHistory
+        onboardingDone = s.onboardingDone; showWidget = s.showWidget; showInDock = s.showInDock; keepHistory = s.keepHistory
     }
 
     func agent(_ kind: AgentKind) -> AgentConfig { kind == .claude ? claude : codex }
@@ -181,28 +185,28 @@ final class AppSettings {
 
     private func save() {
         let s = Stored(serverType: serverType, endpoint: endpoint, routingModel: routingModel,
-                       escalationModel: escalationModel, fallback: fallback, apiKey: apiKey,
+                       escalationModel: escalationModel, fallback: fallback, apiKey: apiKey, lmsPath: lmsPath,
                        claude: claude, codex: codex, defaultFolder: defaultFolder,
                        maxConcurrentJobs: maxConcurrentJobs, sttEngine: sttEngine, languages: languages,
                        speakReplies: speakReplies, voiceIdentifier: voiceIdentifier, speechRate: speechRate,
                        confirmByVoice: confirmByVoice, whisperModel: whisperModel, wakeWordEnabled: wakeWordEnabled, wakeSensitivity: wakeSensitivity,
-                       onboardingDone: onboardingDone, showWidget: showWidget, keepHistory: keepHistory)
+                       onboardingDone: onboardingDone, showWidget: showWidget, showInDock: showInDock, keepHistory: keepHistory)
         if let data = try? JSONEncoder().encode(s) { defaults.set(data, forKey: Self.key) }
     }
 
     /// Every field optional so new settings don't wipe old ones.
     private struct PartialStored: Decodable {
         var serverType: ServerType?; var endpoint: String?; var routingModel: String?; var escalationModel: String?
-        var fallback: FallbackPolicy?; var apiKey: String?; var claude: AgentConfig?; var codex: AgentConfig?
+        var fallback: FallbackPolicy?; var apiKey: String?; var lmsPath: String?; var claude: AgentConfig?; var codex: AgentConfig?
         var defaultFolder: String?; var maxConcurrentJobs: Int?; var sttEngine: STTEngine?; var languages: [String]?
         var speakReplies: SpeakReplies?; var voiceIdentifier: String?; var speechRate: Double?; var confirmByVoice: Bool?
-        var whisperModel: String?; var wakeWordEnabled: Bool?; var wakeSensitivity: Double?; var onboardingDone: Bool?; var showWidget: Bool?
+        var whisperModel: String?; var wakeWordEnabled: Bool?; var wakeSensitivity: Double?; var onboardingDone: Bool?; var showWidget: Bool?; var showInDock: Bool?
         var keepHistory: Bool?
 
         func apply(to s: inout Stored) {
             if let v = serverType { s.serverType = v }; if let v = endpoint { s.endpoint = v }
             if let v = routingModel { s.routingModel = v }; if let v = escalationModel { s.escalationModel = v }
-            if let v = fallback { s.fallback = v }; if let v = apiKey { s.apiKey = v }
+            if let v = fallback { s.fallback = v }; if let v = apiKey { s.apiKey = v }; if let v = lmsPath { s.lmsPath = v }
             if let v = claude { s.claude = v }; if let v = codex { s.codex = v }
             if let v = defaultFolder { s.defaultFolder = v }; if let v = maxConcurrentJobs { s.maxConcurrentJobs = v }
             if let v = sttEngine { s.sttEngine = v }; if let v = languages { s.languages = v }
@@ -210,7 +214,7 @@ final class AppSettings {
             if let v = speechRate { s.speechRate = v }; if let v = confirmByVoice { s.confirmByVoice = v }
             if let v = whisperModel { s.whisperModel = v }; if let v = wakeWordEnabled { s.wakeWordEnabled = v }
             if let v = wakeSensitivity { s.wakeSensitivity = v }
-            if let v = onboardingDone { s.onboardingDone = v }; if let v = showWidget { s.showWidget = v }
+            if let v = onboardingDone { s.onboardingDone = v }; if let v = showWidget { s.showWidget = v }; if let v = showInDock { s.showInDock = v }
             if let v = keepHistory { s.keepHistory = v }
         }
     }

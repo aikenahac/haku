@@ -248,6 +248,7 @@ enum MenuBuilder {
     static func menu(model: AppModel, themes: ThemeManager, togglePanel: @escaping () -> Void,
                      showWorkflows: @escaping () -> Void, toggleWidget: @escaping () -> Void) -> NSMenu {
         let m = NSMenu()
+        m.addItem(ClosureMenuItem("Open Haku window") { AppDelegate.shared?.showMain() })
         m.addItem(ClosureMenuItem("Open panel", key: "") { togglePanel() })
         m.addItem(ClosureMenuItem("Tasks", key: "") { model.showTasks(nil) })
         let flows = NSMenuItem(title: "Workflows", action: nil, keyEquivalent: "")

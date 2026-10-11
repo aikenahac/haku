@@ -13,7 +13,8 @@ final class AppModel: BrainHost {
     @ObservationIgnored let themes: ThemeManager
     @ObservationIgnored let voice: VoicePipeline
     @ObservationIgnored let brain: Brain
-    @ObservationIgnored let history = HistoryStore()
+    let conversations = ConversationStore()
+    @ObservationIgnored private var brainConversationID: UUID?
     @ObservationIgnored let attachmentsStore = AttachmentStore()
     let workflows = WorkflowStore()
     let tasks = TaskStore()
@@ -22,8 +23,8 @@ final class AppModel: BrainHost {
     let wake = WakeWordService()
     @ObservationIgnored private var wakePaused = false
 
-    // Conversation
-    private(set) var messages: [ChatMessage] = []
+    // Conversation (the current one; the main window can switch it)
+    var messages: [ChatMessage] { conversations.current?.messages ?? [] }
     var draft = ""
     private(set) var pendingAttachments: [Attachment] = []
     private(set) var thinking = false
@@ -51,10 +52,8 @@ final class AppModel: BrainHost {
         runner = AgentRunner(store: tasks, settings: settings)
         brain.host = self
         runner.onFinish = { [weak self] job in self?.jobFinished(job) }
-        if settings.keepHistory {
-            messages = history.messages()
-            brain.seed(messages)
-        }
+        conversations.persist = settings.keepHistory
+        if let c = conversations.current { brain.seed(c.messages); brainConversationID = c.id }
         attachmentsStore.purgeAll()
         wake.onWake = { [weak self] after in self?.wakeHeard(after) }
     }
@@ -209,8 +208,15 @@ final class AppModel: BrainHost {
         clearError()
         let attachments = pendingAttachments
         pendingAttachments = []
+        let convo = conversations.currentForSending()
+        conversations.currentID = convo.id
+        if brainConversationID != convo.id {
+            brain.seed(convo.messages)
+            brainConversationID = convo.id
+        }
+        let cid = convo.id
         let user = ChatMessage(role: .user, spans: [.text(text)], attachments: attachments)
-        append(user)
+        conversations.append(user, to: cid)
         lastFailedInput = (text, spoken)
 
         turnTask?.cancel()
@@ -219,28 +225,27 @@ final class AppModel: BrainHost {
             defer { thinking = false; thinkingLabel = nil }
             let replyID = UUID()
             var reply = ChatMessage(id: replyID, role: .haku, spans: [], jobID: replyID)
-            var replyShown = false
             let show: (String) -> Void = { [weak self] text in
                 guard let self else { return }
                 reply.spans = MessageSpan.parse(text)
-                if !replyShown { replyShown = true; self.messages.append(reply) } else { self.replaceMessage(reply) }
+                self.conversations.replace(reply, in: cid)
             }
 
             // Exact workflow trigger wins before the model.
             if let (flow, after) = workflows.match(text) {
                 let result = await executeWorkflow(flow, after: after, messageID: replyID, attachments: attachments)
                 show(result)
-                finishTurn(reply, spoken: spoken, attachments: attachments)
+                finishTurn(reply, in: cid, spoken: spoken)
                 return
             }
 
             do {
                 let r = try await brain.respond(to: text, attachments: attachments, messageID: replyID,
-                                                onDelta: { s in show(s) }, onStatus: { [weak self] s in self?.thinkingLabel = s })
+                                                onDelta: { s in show(s) }, onStatus: { [weak self] s in self?.thinkingLabel = s.isEmpty ? nil : s })
                 show(r.text)
                 lastFailedInput = nil
                 if r.startedJob == nil { attachmentsStore.discard(attachments) }
-                finishTurn(reply, spoken: spoken, attachments: [])
+                finishTurn(reply, in: cid, spoken: spoken)
             } catch is CancellationError {
             } catch let e as LLMError {
                 modelOnline = false
@@ -254,9 +259,16 @@ final class AppModel: BrainHost {
         }
     }
 
-    private func finishTurn(_ reply: ChatMessage, spoken: Bool, attachments: [Attachment]) {
-        guard let final = messages.first(where: { $0.id == reply.id }) else { return }
-        if settings.keepHistory { history.append(final) }
+    private func finishTurn(_ reply: ChatMessage, in cid: UUID, spoken: Bool) {
+        guard let convo = conversations.conversation(cid),
+              let final = convo.messages.first(where: { $0.id == reply.id }) else { return }
+        // Let the model name the chat once it has a first exchange.
+        if !convo.titled, let first = convo.entries.first(where: { $0.role == .user }) {
+            Task {
+                let t = await brain.title(for: first.text)
+                conversations.rename(cid, to: t, byModel: true)
+            }
+        }
         let speak = settings.speakReplies == .always || (settings.speakReplies == .whenISpoke && spoken)
         if speak {
             Task { await voice.speak(final.plainText, allowVoiceBargeIn: spoken) }
@@ -268,20 +280,30 @@ final class AppModel: BrainHost {
         send(text, spoken: spoken)
     }
 
-    private func append(_ m: ChatMessage) {
-        messages.append(m)
-        if settings.keepHistory { history.append(m) }
-        if messages.count > 200 { messages.removeFirst(messages.count - 200) }
+    /// Starts a fresh chat (widget panel "new chat", ⌘N).
+    func newConversation() {
+        conversations.newConversation()
+        brain.reset()
+        brainConversationID = conversations.currentID
     }
 
-    private func replaceMessage(_ m: ChatMessage) {
-        if let i = messages.firstIndex(where: { $0.id == m.id }) { messages[i] = m }
+    /// Makes a past chat current so the widget and panel continue it.
+    func selectConversation(_ id: UUID) {
+        guard conversations.currentID != id, let c = conversations.conversation(id) else { return }
+        conversations.currentID = id
+        brain.seed(c.messages)
+        brainConversationID = id
+    }
+
+    func deleteConversation(_ id: UUID) {
+        conversations.delete(id)
+        if brainConversationID == id { brain.reset(); brainConversationID = nil }
     }
 
     func clearConversation() {
-        messages = []
-        history.clear()
+        conversations.deleteAll()
         brain.reset()
+        brainConversationID = nil
     }
 
     // MARK: Errors
@@ -474,7 +496,7 @@ final class AppModel: BrainHost {
         switch w.action {
         case .askModel:
             do {
-                return try await brain.client.complete(model: settings.routingModel,
+                return try await brain.client.complete(model: try await brain.routingKey(),
                                                        messages: [.system("You are Haku. Be concise. Wrap paths in backticks."), .user(body)])
             } catch {
                 setError("model offline", fix: .modelSettings)

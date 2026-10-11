@@ -33,11 +33,48 @@ final class Brain {
     private let maxContext = 16
     private let maxToolRounds = 5
 
+    let models: ModelManager
+
     init(settings: AppSettings) {
         self.settings = settings
+        models = ModelManager(config: Self.config(settings))
     }
 
     var client: OpenAIClient { OpenAIClient(endpoint: settings.endpoint, apiKey: settings.apiKey) }
+
+    static func config(_ s: AppSettings) -> ModelManager.Config {
+        .init(endpoint: s.endpoint, apiKey: s.apiKey, serverType: s.serverType, lmsPath: s.lmsPath)
+    }
+
+    /// Escalation model unloads itself after 10 idle minutes.
+    static let escalationTTL = 600
+
+    /// Server key for the routing model, loading it if needed.
+    func routingKey(status: (String) -> Void = { _ in }) async throws -> String {
+        await models.update(Self.config(settings))
+        let cached = await models.key(for: settings.routingModel)
+        if cached != settings.routingModel { return try await models.ensureLoaded(settings.routingModel) }
+        status("loading \(settings.routingModel)")
+        return try await models.ensureLoaded(settings.routingModel)
+    }
+
+    func escalationKey() async throws -> String {
+        await models.update(Self.config(settings))
+        return try await models.ensureLoaded(settings.escalationModel, ttl: Self.escalationTTL)
+    }
+
+    /// Loads the always-on routing model at launch.
+    func preload() async {
+        do { let k = try await routingKey(); Log.info("routing model ready: \(k)") }
+        catch { Log.info("routing model not ready: \(error.localizedDescription)") }
+    }
+
+    /// True for "no models loaded" / "model not found" style errors worth one load-and-retry.
+    nonisolated static func isNotLoaded(_ e: Error) -> Bool {
+        guard case let LLMError.http(code, body)? = e as? LLMError else { return false }
+        let b = body.lowercased()
+        return (code == 400 || code == 404) && (b.contains("no models loaded") || b.contains("not loaded") || b.contains("model_not_found") || b.contains("not found"))
+    }
 
     func reset() { context = [] }
 
@@ -59,10 +96,14 @@ final class Brain {
         var reply = BrainReply(text: "")
         var streamed = ""
 
-        for round in 0..<maxToolRounds {
+        var model = try await routingKey(status: onStatus)
+        onStatus("")
+        var retried = false
+        var round = 0
+        while round < maxToolRounds {
             var calls: [LLMToolCall] = []
             var content = ""
-            let stream = client.streamChat(model: settings.routingModel,
+            let stream = client.streamChat(model: model,
                                            messages: [.system(systemPrompt())] + context + turn,
                                            tools: round < maxToolRounds - 1 ? Self.tools(settings: settings) : nil)
             do {
@@ -77,6 +118,14 @@ final class Brain {
                     }
                 }
             } catch let e as LLMError {
+                if Self.isNotLoaded(e), !retried, content.isEmpty {
+                    retried = true
+                    onStatus("loading \(settings.routingModel)")
+                    await models.update(Self.config(settings))
+                    model = try await models.ensureLoaded(settings.routingModel)
+                    onStatus("")
+                    continue
+                }
                 if case .unreachable = e, settings.fallback == .useEscalation, round == 0 {
                     let r = try await escalate(text, onDelta: onDelta)
                     return remember(text, BrainReply(text: r, usedEscalation: true))
@@ -134,6 +183,7 @@ final class Brain {
                 turn.append(.tool(call.id, name: call.function.name, "skipped"))
             }
             streamed = ""
+            round += 1
         }
         if reply.text.isEmpty { reply.text = "Done." ; onDelta(reply.text) }
         return remember(text, reply)
@@ -150,7 +200,8 @@ final class Brain {
     func escalate(_ prompt: String, onDelta: @escaping (String) -> Void) async throws -> String {
         var out = ""
         let messages: [LLMMessage] = [.system(Self.escalationPrompt)] + context.suffix(8) + [.user(prompt)]
-        for try await ev in client.streamChat(model: settings.escalationModel, messages: messages, temperature: 0.5) {
+        let model = try await escalationKey()
+        for try await ev in client.streamChat(model: model, messages: messages, temperature: 0.5) {
             if case .content(let s) = ev { out += s; onDelta(out) }
         }
         return out.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -162,14 +213,16 @@ final class Brain {
         let fallback = job.status == .failed ? "\(job.runner.displayName) failed: \(job.title)." : "\(job.runner.displayName) finished \(job.title)."
         guard !raw.isEmpty else { return fallback }
         let prompt = "Summarize this agent result in one short spoken sentence (max 25 words), no markdown:\n\n\(raw.prefix(4000))"
-        let s = try? await client.complete(model: settings.routingModel, messages: [.user(prompt)], maxTokens: 80)
+        guard let model = try? await routingKey() else { return fallback }
+        let s = try? await client.complete(model: model, messages: [.user(prompt)], maxTokens: 80)
         return (s?.isEmpty == false ? s! : fallback)
     }
 
     /// Short title for a job from its prompt ("Run devenv tests, report failures").
     func title(for task: String) async -> String {
         let prompt = "Write a 3–7 word title for this task, imperative, no quotes or trailing period:\n\n\(task.prefix(1500))"
-        let t = (try? await client.complete(model: settings.routingModel, messages: [.user(prompt)], maxTokens: 24)) ?? ""
+        guard let model = try? await routingKey() else { return String(task.prefix(60)) }
+        let t = (try? await client.complete(model: model, messages: [.user(prompt)], maxTokens: 24)) ?? ""
         let clean = t.trimmingCharacters(in: CharacterSet(charactersIn: "\"'. \n"))
         return clean.isEmpty || clean.count > 80 ? String(task.prefix(60)) : clean
     }

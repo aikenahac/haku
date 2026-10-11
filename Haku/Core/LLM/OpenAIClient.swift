@@ -116,9 +116,17 @@ enum LLMError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unreachable(let s): "model server unreachable (\(s))"
-        case .http(let code, let body): "model server error \(code): \(body.prefix(200))"
+        case .http(let code, let body): "model server error \(code): \(Self.message(from: body))"
         case .badResponse: "unexpected response from the model server"
         }
+    }
+
+    /// Pulls `error.message` out of an OpenAI-style error body.
+    static func message(from body: String) -> String {
+        if let j = JSONValue.parse(body), let m = j["error"]?["message"]?.stringValue ?? j["error"]?.stringValue ?? j["message"]?.stringValue {
+            return m
+        }
+        return String(body.prefix(200))
     }
 
     /// Short reason for the widget error state.

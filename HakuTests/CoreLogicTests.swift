@@ -196,3 +196,19 @@ final class WakeWordTests: XCTestCase {
         XCTAssertEqual(WakeWordService.threshold(1), 0.2, accuracy: 0.001)
     }
 }
+
+final class ModelManagerTests: XCTestCase {
+    func testResolveModelKeys() {
+        let keys = ["google/gemma-4-e4b-it-mlx", "qwen/qwen3.8-27b-mlx-4bit", "text-embedding-nomic"]
+        XCTAssertEqual(ModelManager.resolve("gemma-4-e4b", among: keys), "google/gemma-4-e4b-it-mlx")
+        XCTAssertEqual(ModelManager.resolve("qwen3.8-27b", among: keys), "qwen/qwen3.8-27b-mlx-4bit")
+        XCTAssertEqual(ModelManager.resolve("google/gemma-4-e4b-it-mlx", among: keys), "google/gemma-4-e4b-it-mlx")
+        XCTAssertNil(ModelManager.resolve("llama-3", among: keys))
+    }
+
+    func testNotLoadedDetection() {
+        let e = LLMError.http(400, #"{"error":{"message":"No models loaded. Please load a model in the developer page or use the 'lms load' command.","type":"invalid_request_error"}}"#)
+        XCTAssertTrue(Brain.isNotLoaded(e))
+        XCTAssertTrue(e.localizedDescription.hasSuffix("use the 'lms load' command."))
+    }
+}

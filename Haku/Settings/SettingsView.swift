@@ -11,6 +11,7 @@ enum SettingsSection: String, CaseIterable, Identifiable {
 /// Settings window (Margin-Settings): 160 pt nav + form sections.
 struct SettingsView: View {
     @Environment(\.theme) private var theme
+    @Environment(\.embeddedInMainWindow) private var embedded
     @Bindable var state: SettingsSectionState
     var showWorkflows: () -> Void
     var showOnboarding: () -> Void
@@ -32,14 +33,16 @@ struct SettingsView: View {
                     .buttonStyle(.plain)
                 }
                 Spacer()
-                Button { NSApp.keyWindow?.performClose(nil) } label: { Text("close").font(theme.font(.link(13))) }
-                    .buttonStyle(InkLinkStyle(size: 13))
-                    .keyboardShortcut("w", modifiers: .command)
-                    .padding(.horizontal, 10)
+                if !embedded {
+                    Button { NSApp.keyWindow?.performClose(nil) } label: { Text("close").font(theme.font(.link(13))) }
+                        .buttonStyle(InkLinkStyle(size: 13))
+                        .keyboardShortcut("w", modifiers: .command)
+                        .padding(.horizontal, 10)
+                }
             }
             .padding(.vertical, 18).padding(.horizontal, 10)
             .frame(width: 160)
-            .padding(.top, 10)
+            .padding(.top, embedded ? 26 : 10)
             VRule()
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
@@ -113,11 +116,17 @@ struct GeneralSettings: View {
                 InkSwitch(isOn: Binding(get: { loginItem }, set: { loginItem = $0; LoginItem.set($0) }))
             }
             FormRow(label: "Show widget") { InkSwitch(isOn: $settings.showWidget) }
+            FormRow(label: "Show in Dock") {
+                HStack(spacing: 10) {
+                    InkSwitch(isOn: $settings.showInDock)
+                    Text("off = menu bar and widget only").textRole(.ui, theme).foregroundStyle(theme.colors.muted)
+                }
+            }
             FormRow(label: "Keep history") {
                 HStack(spacing: 10) {
                     InkSwitch(isOn: $settings.keepHistory)
                     Text("text only; attachments are deleted after each task").textRole(.ui, theme).foregroundStyle(theme.colors.muted)
-                    Button("clear") { model.clearConversation() }.buttonStyle(InkLinkStyle(size: 13))
+                    Button("delete all chats") { model.clearConversation() }.buttonStyle(InkLinkStyle(size: 13, color: theme.colors.error))
                 }
             }
             FormRow(label: "Workflows") {
@@ -191,6 +200,18 @@ struct ModelSettings: View {
             }
             FormRow(label: "If it's down") {
                 InkPicker(options: FallbackPolicy.allCases, selection: $settings.fallback) { $0.label }
+            }
+            if settings.serverType == .lmStudio {
+                FormRow(label: "lms CLI") {
+                    HStack(spacing: 10) {
+                        let found = ModelManager.findLMS(configured: settings.lmsPath)
+                        InkTextField(placeholder: found?.abbreviatingHome ?? "not found", text: $settings.lmsPath)
+                        Text(found == nil ? "needed to load models on demand" : "loads models on demand")
+                            .font(FontFactory.font(theme.type.voice, size: 13, italic: true))
+                            .foregroundStyle(found == nil ? theme.colors.error : theme.colors.blueInk)
+                            .fixedSize()
+                    }
+                }
             }
             if settings.serverType == .openAI {
                 FormRow(label: "API key") { InkTextField(placeholder: "optional", text: $settings.apiKey) }

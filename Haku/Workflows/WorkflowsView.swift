@@ -5,6 +5,7 @@ import SwiftUI
 /// Workflows editor (Margin-Workflows): list + editor for name, phrases, action, template, safety, hotkey.
 struct WorkflowsView: View {
     @Environment(\.theme) private var theme
+    @Environment(\.embeddedInMainWindow) private var embedded
     @Environment(AppModel.self) private var model
     @State private var selected: UUID?
     @State private var draft: Workflow?
@@ -17,11 +18,14 @@ struct WorkflowsView: View {
                 Text("Workflows").textRole(.windowTitle, theme).foregroundStyle(theme.colors.ink)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Button("+ new workflow") { newWorkflow() }.buttonStyle(InkLinkStyle())
-                Button { NSApp.keyWindow?.performClose(nil) } label: { CloseGlyph() }
-                    .buttonStyle(IconButtonStyle()).keyboardShortcut("w", modifiers: .command)
+                if !embedded {
+                    Button { NSApp.keyWindow?.performClose(nil) } label: { CloseGlyph() }
+                        .buttonStyle(IconButtonStyle()).keyboardShortcut("w", modifiers: .command)
+                }
             }
-            .padding(.leading, 18).padding(.trailing, 10)
-            .frame(height: 54)
+            .padding(.leading, embedded ? 24 : 18).padding(.trailing, embedded ? 18 : 10)
+            .padding(.top, embedded ? 26 : 0)
+            .frame(height: embedded ? 80 : 54)
             HRule()
             HStack(spacing: 0) {
                 ScrollView {

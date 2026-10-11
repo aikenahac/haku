@@ -11,12 +11,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var confirm: ConfirmController!
     private var statusItem: StatusItemController!
     private let hotkeys = HotkeyManager()
-    private var tasksWindow: AppWindow?
-    private var settingsWindow: AppWindow?
-    private var workflowsWindow: AppWindow?
+    private var mainWindow: AppWindow?
+    private let nav = MainNavState()
     private var onboardingWindow: AppWindow?
+    static weak var shared: AppDelegate?
     private var settingsSection = SettingsSectionState()
     private var tasksSelection = TasksSelectionState()
+
+    override init() {
+        super.init()
+        AppDelegate.shared = self
+    }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         FontRegistry.registerBundledFonts()
@@ -65,7 +70,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         Notifier.requestAuthorization()
 
         if settings.showWidget { widget.show() }
-        if !settings.onboardingDone { showOnboarding() }
+        applyDockPolicy()
+        observeChanges { [unowned self] in _ = settings.showInDock; applyDockPolicy() }
+        if !settings.onboardingDone { showOnboarding() } else if settings.showInDock { showMain() }
 
         // Wake word follows its setting, permissions, and whatever else is using the mic.
         observeChanges { [unowned self] in
@@ -77,6 +84,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             MainActor.assumeIsolated { self?.model.syncWakeWord() }   // picks up a newly granted mic
         }
 
+        Task { await model.brain.preload() }
         Task {
             while true {
                 await model.refreshModelStatus()
@@ -86,8 +94,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        panel.show()
+        showMain()
         return true
+    }
+
+    /// Dock icon + menu bar when "Show in Dock" is on; otherwise a menu-bar/widget-only accessory app.
+    private func applyDockPolicy() {
+        NSApp.setActivationPolicy(settings.showInDock ? .regular : .accessory)
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -103,6 +116,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             let text = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "text" }?.value ?? ""
             switch url.host {
             case "panel": panel.show()
+            case "main": showMain()
             case "tasks": showTasks(select: nil)
             case "settings": showSettings(text.isEmpty ? nil : text)
             case "workflows": showWorkflows()
@@ -166,35 +180,35 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             .environment(settings)
     }
 
-    func showTasks(select id: UUID?) {
-        if let id { tasksSelection.selected = id }
-        if tasksWindow == nil {
-            tasksWindow = AppWindow(title: "Tasks", size: NSSize(width: 900, height: 620), minSize: NSSize(width: 680, height: 420)) {
-                themed(TasksView(selection: tasksSelection))
+    /// The main app window (chat history, tasks, workflows, settings).
+    func showMain(_ section: MainSection? = nil) {
+        if let section { nav.section = section }
+        if mainWindow == nil {
+            mainWindow = AppWindow(title: "Haku", size: NSSize(width: 1120, height: 740), minSize: NSSize(width: 860, height: 520),
+                                   trafficLights: true) {
+                themed(MainWindowView(nav: nav, tasksSelection: tasksSelection, settingsSection: settingsSection,
+                                      showOnboarding: { [unowned self] in showOnboarding() }))
             }
         }
-        tasksWindow?.show()
+        mainWindow?.show()
+    }
+
+    func newChat() {
+        model.newConversation()
+        showMain(.chat)
+    }
+
+    func showTasks(select id: UUID?) {
+        if let id { tasksSelection.selected = id }
+        showMain(.tasks)
     }
 
     func showSettings(_ section: String?) {
         if let section, let s = SettingsSection(rawValue: section) { settingsSection.section = s }
-        if settingsWindow == nil {
-            settingsWindow = AppWindow(title: "Settings", size: NSSize(width: 820, height: 640), minSize: NSSize(width: 700, height: 480)) {
-                themed(SettingsView(state: settingsSection, showWorkflows: { [unowned self] in showWorkflows() },
-                                    showOnboarding: { [unowned self] in showOnboarding() }))
-            }
-        }
-        settingsWindow?.show()
+        showMain(.settings)
     }
 
-    func showWorkflows() {
-        if workflowsWindow == nil {
-            workflowsWindow = AppWindow(title: "Workflows", size: NSSize(width: 900, height: 640), minSize: NSSize(width: 720, height: 480)) {
-                themed(WorkflowsView())
-            }
-        }
-        workflowsWindow?.show()
-    }
+    func showWorkflows() { showMain(.workflows) }
 
     func showOnboarding() {
         if onboardingWindow == nil {
@@ -203,6 +217,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     settings.onboardingDone = true
                     onboardingWindow?.window.close()
                     if settings.showWidget { widget.show() }
+                    if settings.showInDock { showMain(.chat) }
                 }))
             }
         }
