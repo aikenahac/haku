@@ -93,6 +93,8 @@ To package a drag-to-install `Haku.dmg` at the repo root:
 ./tools/package-dmg.sh
 ```
 
+The script lays out the Finder window through Finder itself, so the first run asks to let your terminal control Finder. The window art is `tools/dmg/background*.png`, rendered by `PromoImageTests/testRenderDMGBackground`.
+
 The app is signed with your development identity, not notarized, so on another Mac Gatekeeper will block the first launch. Right-click › Open, or run `xattr -dr com.apple.quarantine /Applications/Haku.app`.
 
 On first launch, a five-step onboarding asks for the microphone, speech recognition and Accessibility permissions. Accessibility is used for the global hotkeys and for reading your selection in workflows. Screen Recording is only requested if you use "attach screenshot".
