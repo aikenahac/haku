@@ -350,15 +350,29 @@ struct HotkeySettings: View {
             FormRow(label: "Speak replies") {
                 InkSegmented(options: SpeakReplies.allCases, selection: $settings.speakReplies) { $0.label }
             }
+            FormRow(label: "Engine") {
+                InkSegmented(options: TTSEngine.allCases, selection: $settings.ttsEngine) { $0.label }
+                    .onChange(of: settings.ttsEngine) { model.voice.prepareVoice() }
+            }
             FormRow(label: "Voice") {
                 HStack(spacing: 10) {
-                    InkPicker(options: [""] + SystemSpeech.availableVoices.map(\.identifier), selection: $settings.voiceIdentifier) { id in
-                        id.isEmpty ? "[system voice]" : (AVSpeechSynthesisVoice(identifier: id).map { "\($0.name) · \($0.language)" } ?? id)
+                    if settings.ttsEngine == .kokoro {
+                        InkPicker(options: KokoroSpeech.voices, selection: $settings.kokoroVoice) { KokoroSpeech.label(for: $0) }
+                    } else {
+                        InkPicker(options: [""] + SystemSpeech.availableVoices.map(\.identifier), selection: $settings.voiceIdentifier) { id in
+                            id.isEmpty ? "[system voice]" : (AVSpeechSynthesisVoice(identifier: id).map { "\($0.name) · \($0.language)" } ?? id)
+                        }
                     }
                     Button("preview") {
                         Task { await model.voice.speak("Hi, I'm Haku. Hold the hotkey and tell me what you need.", allowVoiceBargeIn: false) }
                     }
                     .buttonStyle(InkLinkStyle())
+                }
+            }
+            if settings.ttsEngine == .kokoro, !model.voice.kokoro.isReady {
+                FormRow(label: "") {
+                    Text("Kokoro \(model.voice.kokoro.state.label) · the macOS voice speaks until it's ready")
+                        .textRole(.ui, theme).foregroundStyle(theme.colors.muted)
                 }
             }
             FormRow(label: "Rate") {

@@ -57,7 +57,7 @@ The design direction is called **Margin: paper and ink**. Haku speaks in a serif
 </p>
 
 Where the design lives:
-- `design/` holds the source of truth. Start with `HANDOFF.md`, then the HTML mockups.
+- `design/` holds the source of truth.
 - Colors are generated from [`tools/design-tokens/colors.json`](tools/design-tokens/colors.json) into an asset catalog.
 - Every gap or decision the mockups don't cover is logged in [`DESIGN_NOTES.md`](DESIGN_NOTES.md).
 - The images in this README are rendered from the app's real SwiftUI views by [`HakuTests/PromoImageTests.swift`](HakuTests/PromoImageTests.swift).

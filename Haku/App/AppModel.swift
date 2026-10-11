@@ -223,6 +223,7 @@ final class AppModel: BrainHost {
         conversations.append(user, to: cid)
         lastFailedInput = (text, spoken, cid)
 
+        let speak = settings.speakReplies == .always || (settings.speakReplies == .whenISpoke && spoken)
         turnTask?.cancel()
         turnTask = Task {
             thinking = true
@@ -239,43 +240,50 @@ final class AppModel: BrainHost {
             if let (flow, after) = workflows.match(text) {
                 let result = await executeWorkflow(flow, after: after, messageID: replyID, attachments: attachments)
                 show(result)
-                finishTurn(reply, in: cid, spoken: spoken)
+                finishTurn(reply, in: cid)
+                if speak { Task { await voice.speak(result, allowVoiceBargeIn: spoken) } }
                 return
             }
 
+            // Speech starts with the first finished sentence, while the rest is still streaming.
+            let speechID = speak ? voice.beginSpokenReply(allowVoiceBargeIn: spoken) : nil
             do {
                 let r = try await brain.respond(to: text, attachments: attachments, messageID: replyID,
-                                                onDelta: { s in show(s) }, onStatus: { [weak self] s in self?.thinkingLabel = s.isEmpty ? nil : s })
+                                                onDelta: { [weak self] s in
+                                                    show(s)
+                                                    if let speechID { self?.voice.appendReplyText(speechID, s) }
+                                                },
+                                                onStatus: { [weak self] s in self?.thinkingLabel = s.isEmpty ? nil : s })
                 show(r.text)
                 lastFailedInput = nil
                 if r.startedJob == nil { attachmentsStore.discard(attachments) }
-                finishTurn(reply, in: cid, spoken: spoken)
+                finishTurn(reply, in: cid)
+                if let speechID { Task { await voice.endSpokenReply(speechID, finalText: r.text) } }
             } catch is CancellationError {
+                if let speechID { voice.cancelSpokenReply(speechID) }
             } catch let e as LLMError {
+                if let speechID { voice.cancelSpokenReply(speechID) }
                 modelOnline = false
                 setError(e.widgetReason, fix: .modelSettings)
                 show(e.localizedDescription.prefix(1).uppercased() + e.localizedDescription.dropFirst() + ". Check Settings › Models & agents.")
                 attachmentsStore.discard(attachments)
             } catch {
+                if let speechID { voice.cancelSpokenReply(speechID) }
                 setError("something broke", fix: .retry)
                 attachmentsStore.discard(attachments)
             }
         }
     }
 
-    private func finishTurn(_ reply: ChatMessage, in cid: UUID, spoken: Bool) {
+    private func finishTurn(_ reply: ChatMessage, in cid: UUID) {
         guard let convo = conversations.conversation(cid),
-              let final = convo.messages.first(where: { $0.id == reply.id }) else { return }
+              convo.messages.contains(where: { $0.id == reply.id }) else { return }
         // Let the model name the chat once it has a first exchange.
         if !convo.titled, let first = convo.entries.first(where: { $0.role == .user }) {
             Task {
                 let t = await brain.title(for: first.text)
                 conversations.rename(cid, to: t, byModel: true)
             }
-        }
-        let speak = settings.speakReplies == .always || (settings.speakReplies == .whenISpoke && spoken)
-        if speak {
-            Task { await voice.speak(final.plainText, allowVoiceBargeIn: spoken) }
         }
     }
 

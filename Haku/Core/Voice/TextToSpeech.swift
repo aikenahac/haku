@@ -1,7 +1,7 @@
 @preconcurrency import AVFoundation
 import NaturalLanguage
 
-/// Speech output. v1 uses AVSpeechSynthesizer; anything conforming to `SpeechOutput` can replace it.
+/// Speech output: `SystemSpeech` (AVSpeechSynthesizer) or `KokoroSpeech`.
 @MainActor
 protocol SpeechOutput: AnyObject {
     var isSpeaking: Bool { get }
@@ -65,13 +65,7 @@ final class SystemSpeech: NSObject, SpeechOutput, AVSpeechSynthesizerDelegate {
     }
 
     /// Strips markup the voice shouldn't read out.
-    static func speakable(_ text: String) -> String {
-        var t = text.replacingOccurrences(of: "==", with: "")
-        t = t.replacingOccurrences(of: "**", with: "")
-        t = t.replacingOccurrences(of: "`", with: "")
-        t = t.replacingOccurrences(of: "~/", with: "home ")
-        return t.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
+    static func speakable(_ text: String) -> String { SpeechText.clean(text) }
 
     static var availableVoices: [AVSpeechSynthesisVoice] {
         AVSpeechSynthesisVoice.speechVoices()

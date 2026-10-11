@@ -72,6 +72,12 @@ enum STTEngine: String, CaseIterable, Codable, Sendable, Identifiable {
     var label: String { self == .onDevice ? "macOS, on device" : "Whisper, local" }
 }
 
+enum TTSEngine: String, CaseIterable, Codable, Sendable, Identifiable {
+    case kokoro, system
+    var id: String { rawValue }
+    var label: String { self == .kokoro ? "Kokoro, natural" : "macOS voices" }
+}
+
 enum SpeakReplies: String, CaseIterable, Codable, Sendable, Identifiable {
     case always, whenISpoke, never
     var id: String { rawValue }
@@ -115,6 +121,8 @@ final class AppSettings {
     var sttEngine: STTEngine { didSet { save() } }
     var languages: [String] { didSet { save() } }
     var speakReplies: SpeakReplies { didSet { save() } }
+    var ttsEngine: TTSEngine { didSet { save() } }
+    var kokoroVoice: String { didSet { save() } }
     var voiceIdentifier: String { didSet { save() } }
     var speechRate: Double { didSet { save() } }
     var confirmByVoice: Bool { didSet { save() } }
@@ -143,6 +151,8 @@ final class AppSettings {
         var sttEngine: STTEngine = .onDevice
         var languages = ["en-US"]
         var speakReplies: SpeakReplies = .whenISpoke
+        var ttsEngine: TTSEngine = .kokoro
+        var kokoroVoice = "af_heart"
         var voiceIdentifier = ""
         var speechRate = 0.5
         var confirmByVoice = true
@@ -173,6 +183,7 @@ final class AppSettings {
         escalationModel = s.escalationModel; fallback = s.fallback; apiKey = s.apiKey; lmsPath = s.lmsPath
         claude = s.claude; codex = s.codex; defaultFolder = s.defaultFolder; maxConcurrentJobs = s.maxConcurrentJobs
         sttEngine = s.sttEngine; languages = s.languages; speakReplies = s.speakReplies
+        ttsEngine = s.ttsEngine; kokoroVoice = s.kokoroVoice
         voiceIdentifier = s.voiceIdentifier; speechRate = s.speechRate; confirmByVoice = s.confirmByVoice
         whisperModel = s.whisperModel; wakeWordEnabled = s.wakeWordEnabled; wakeSensitivity = s.wakeSensitivity
         onboardingDone = s.onboardingDone; showWidget = s.showWidget; showInDock = s.showInDock; keepHistory = s.keepHistory
@@ -199,7 +210,7 @@ final class AppSettings {
                        escalationModel: escalationModel, fallback: fallback, apiKey: apiKey, lmsPath: lmsPath,
                        claude: claude, codex: codex, defaultFolder: defaultFolder,
                        maxConcurrentJobs: maxConcurrentJobs, sttEngine: sttEngine, languages: languages,
-                       speakReplies: speakReplies, voiceIdentifier: voiceIdentifier, speechRate: speechRate,
+                       speakReplies: speakReplies, ttsEngine: ttsEngine, kokoroVoice: kokoroVoice, voiceIdentifier: voiceIdentifier, speechRate: speechRate,
                        confirmByVoice: confirmByVoice, whisperModel: whisperModel, wakeWordEnabled: wakeWordEnabled, wakeSensitivity: wakeSensitivity,
                        onboardingDone: onboardingDone, showWidget: showWidget, showInDock: showInDock, keepHistory: keepHistory)
         if let data = try? JSONEncoder().encode(s) { defaults.set(data, forKey: Self.key) }
@@ -210,7 +221,7 @@ final class AppSettings {
         var serverType: ServerType?; var endpoint: String?; var routingModel: String?; var escalationModel: String?
         var fallback: FallbackPolicy?; var apiKey: String?; var lmsPath: String?; var claude: AgentConfig?; var codex: AgentConfig?
         var defaultFolder: String?; var maxConcurrentJobs: Int?; var sttEngine: STTEngine?; var languages: [String]?
-        var speakReplies: SpeakReplies?; var voiceIdentifier: String?; var speechRate: Double?; var confirmByVoice: Bool?
+        var speakReplies: SpeakReplies?; var ttsEngine: TTSEngine?; var kokoroVoice: String?; var voiceIdentifier: String?; var speechRate: Double?; var confirmByVoice: Bool?
         var whisperModel: String?; var wakeWordEnabled: Bool?; var wakeSensitivity: Double?; var onboardingDone: Bool?; var showWidget: Bool?; var showInDock: Bool?
         var keepHistory: Bool?
 
@@ -222,6 +233,7 @@ final class AppSettings {
             if let v = defaultFolder { s.defaultFolder = v }; if let v = maxConcurrentJobs { s.maxConcurrentJobs = v }
             if let v = sttEngine { s.sttEngine = v }; if let v = languages { s.languages = v }
             if let v = speakReplies { s.speakReplies = v }; if let v = voiceIdentifier { s.voiceIdentifier = v }
+            if let v = ttsEngine { s.ttsEngine = v }; if let v = kokoroVoice { s.kokoroVoice = v }
             if let v = speechRate { s.speechRate = v }; if let v = confirmByVoice { s.confirmByVoice = v }
             if let v = whisperModel { s.whisperModel = v }; if let v = wakeWordEnabled { s.wakeWordEnabled = v }
             if let v = wakeSensitivity { s.wakeSensitivity = v }
